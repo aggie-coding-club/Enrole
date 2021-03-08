@@ -1,6 +1,6 @@
-# sot_alpha
+# enrole_app_dev
 
-A new Flutter project.
+Developing file for enrole
 
 ## Getting Started
 
