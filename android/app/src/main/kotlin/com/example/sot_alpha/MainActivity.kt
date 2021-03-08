@@ -1,4 +1,4 @@
-package com.enrole.enrole_app_dev
+package com.example.sot_alpha
 
 import io.flutter.embedding.android.FlutterActivity
 
