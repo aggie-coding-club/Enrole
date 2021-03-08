@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "785427413245",
+    "firebase_url": "https://enrole-dev.firebaseio.com",
+    "project_id": "enrole-dev",
+    "storage_bucket": "enrole-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:785427413245:android:b26a89411617b74a076694",
+        "android_client_info": {
+          "package_name": "com.enrole.enrole_app_dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "785427413245-mnh3qiqouqeqafbvtbsfk5tf3c3h80um.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcvM_2xABKznSft2lsYt9h4iKkPVwgYOw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "785427413245-mnh3qiqouqeqafbvtbsfk5tf3c3h80um.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
