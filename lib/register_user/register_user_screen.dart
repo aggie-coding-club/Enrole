@@ -13,8 +13,8 @@ class RegisterUserPage extends StatefulWidget {
 class _RegisterUserPageState extends State<RegisterUserPage> {
   FirebaseAuth _auth =
       FirebaseAuth.instance; // Creates FirebaseAuth instance for authentication
-  Firestore _firestore =
-      Firestore.instance; // Creates Firestore instance for data
+  FirebaseFirestore _firestore =
+      FirebaseFirestore.instance; // Creates Firestore instance for data
 
   String _email;
   String _password1;
@@ -32,8 +32,8 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
       try {
         await _auth.createUserWithEmailAndPassword(
             email: _email, password: _password2);
-        final user = await _auth.currentUser();
-        await _firestore.collection('users').document(user.uid).setData({
+        final user = _auth.currentUser;
+        await _firestore.collection('users').doc(user.uid).set({
           // Saves the users email and joining date under their profile
           'email': _email,
           'joined': DateTime.now().toString(),

@@ -14,7 +14,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-  Firestore _firestore = Firestore.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -32,10 +32,10 @@ class _HomeState extends State<Home> {
     String role;
     DocumentSnapshot docData;
     try{
-      final user = await _auth.currentUser();
+      final user = _auth.currentUser;
       if(user != null){
-        await _firestore.collection('orgs').document(orgID).collection('members').document(user.uid).get().then((DocumentSnapshot ds) {docData = ds;});
-        role = docData.data['role'];
+        await _firestore.collection('orgs').doc(orgID).collection('members').doc(user.uid).get().then((DocumentSnapshot ds) {docData = ds;});
+        role = docData.data()['role'];
         return role;
       }
       return 'error';
@@ -48,21 +48,21 @@ class _HomeState extends State<Home> {
     String orgName;
     String id;
     try{
-      final user = await _auth.currentUser();
+      final user = _auth.currentUser;
       if(user != null){
-        await _firestore.collection('users').document(user.uid).collection('orgs').getDocuments().then((value) {
-          orgListDocs = value.documents;
+        await _firestore.collection('users').doc(user.uid).collection('orgs').get().then((value) {
+          orgListDocs = value.docs;
           print(orgListDocs);
         });
         for(var i = 0; i < orgListDocs.length; i++){
           String orgName = '';
           String role = '';
-          await _firestore.collection('orgs').document(orgListDocs[i].data['orgID']).get().then((value) {orgName = value.data['orgName'];});
+          await _firestore.collection('orgs').doc(orgListDocs[i].data()['orgID']).get().then((value) {orgName = value.data()['orgName'];});
           print('Got org name');
-          await _firestore.collection('orgs').document(orgListDocs[i].data['orgID']).collection('members').document(user.uid).get().then((value) {role = value.data['role'];});
+          await _firestore.collection('orgs').doc(orgListDocs[i].data()['orgID']).collection('members').doc(user.uid).get().then((value) {role = value.data()['role'];});
           print('Got org role');
           final newOrg = OrgNameIDRole(
-            id: orgListDocs[i].data['orgID'],
+            id: orgListDocs[i].data()['orgID'],
             name: orgName,
             role: role,
           );

@@ -19,20 +19,22 @@ class School{  // Defines the class "school" to be used in _________
 Future<String> searchSchools({String query}) async {  // Returns a future list of school names based on the user's search bar input
   // String parsedQuery = query;
 
+
+  //TODO: Implement Realtime Database to determine school from domain
   // parsedQuery = parsedQuery.replaceAll(' ', '+');  // converts to notation needed for API
   // parsedQuery = parsedQuery.replaceAll('&', '%26');
-print('Searched: http://universities.hipolabs.com/search?domain=$query');
-  final response = await http.get('http://universities.hipolabs.com/search?domain=$query');  // Calls on the API with the search criteria
-  print('Got response');
+// print('Searched: http://universities.hipolabs.com/search?domain=$query');
+//   final response = await http.get('http://universities.hipolabs.com/search?domain=$query');  // Calls on the API with the search criteria
+//   print('Got response');
   
 
-  if(response.statusCode == 200){  // If the API is successfully called
-    List<School> schools = SchoolList.fromJson(jsonDecode(response.body)).schools;  // Parses the returned JSON data from the API
-    String returnedSchool = schools.first.name;
-    return returnedSchool;
-  }else {
-    throw Exception();
-  }
+//   if(response.statusCode == 200){  // If the API is successfully called
+//     List<School> schools = SchoolList.fromJson(jsonDecode(response.body)).schools;  // Parses the returned JSON data from the API
+//     String returnedSchool = schools.first.name;
+//     return returnedSchool;
+//   }else {
+//     throw Exception();
+//   }
 }
 class SchoolList {
   final List<School> schools;

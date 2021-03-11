@@ -20,7 +20,7 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
 
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  HttpsCallable _joinRequest = CloudFunctions.instance.getHttpsCallable(functionName: 'joinRequest');
+  HttpsCallable _joinRequest = FirebaseFunctions.instance.httpsCallable('joinRequest');
 
   Widget joinTile(String orgType){
     String titleString;
@@ -60,7 +60,7 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                     Navigator.pop(context);
                   String date = DateTime.now().toString();
                     try {
-                      final user = await _auth.currentUser();
+                      final user = _auth.currentUser;
                       await _joinRequest.call(<String, dynamic>{
                         'orgType': orgType,
                         'orgID': this.widget.orgData.data['orgID'],

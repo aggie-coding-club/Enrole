@@ -50,7 +50,7 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
     print('test');
     var status = await Permission.photos.status;
     print('test $status');
-    if(status.isUndetermined) {
+    if(status.isDenied) {
       Permission.photos.request();
       }
     else if(status.isGranted){

@@ -26,7 +26,7 @@ class _VerifyPageState extends State<VerifyPage> {
   
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Firestore _firestore = Firestore.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   FirebaseStorage _storage = FirebaseStorage.instance;
 
@@ -39,8 +39,8 @@ class _VerifyPageState extends State<VerifyPage> {
   bool publishing = false;
 
   Future<Widget> isEmailVerified() async {
-    final user = await _auth.currentUser();
-    if(user.isEmailVerified){
+    final user = _auth.currentUser;
+    if(user.emailVerified){
       setState(() {
         isEmailVerifiedVar = true;
       });
@@ -90,13 +90,13 @@ class _VerifyPageState extends State<VerifyPage> {
 
   void publishOrgToFirestore({String orgName, String orgType, String school, File image, String bio, List<String> tags}) async {
     try{
-      final user = await _auth.currentUser();
+      final user = _auth.currentUser;
       String orgID = uuid.v4().substring(0, 8);
       if(user != null){
-        await _storage.ref().child('orgs/$orgID/profileImage').putFile(image).onComplete;
+        await _storage.ref().child('orgs/$orgID/profileImage').putFile(image);
         final profileImage = await _storage.ref().child('orgs/$orgID/profileImage').getDownloadURL();
         final profileImageURL = profileImage.toString();
-        await _firestore.collection('orgs').document(orgID).setData({
+        await _firestore.collection('orgs').doc(orgID).set({
           'orgName': orgName,
           'orgType': orgType,
           'school': school,
@@ -106,7 +106,7 @@ class _VerifyPageState extends State<VerifyPage> {
           'owner': user.uid,
           'orgID': orgID,
         });
-        await _firestore.collection('orgs').document(orgID).collection('members').document(user.uid).setData({
+        await _firestore.collection('orgs').doc(orgID).collection('members').doc(user.uid).set({
           'id': user.uid,
           'role': 'admin',
           'joined': DateTime.now(),

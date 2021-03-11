@@ -1,3 +1,4 @@
+import 'package:enrole_app_dev/keys.dart';
 import 'package:enrole_app_dev/builders/school_search.dart';
 import 'package:enrole_app_dev/home/home_pages/search_orgs/school_search_popup.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class SearchOrgs extends StatefulWidget {
 
 class _SearchOrgsState extends State<SearchOrgs> {
 
-  Algolia _algolia = Algolia.init(applicationId: 'OT8BFMIZX0', apiKey: '83fc29b0fb59d3562c57f18a8da33e5b').instance;
+  Algolia _algolia = Algolia.init(applicationId: algoliaAppID, apiKey: algoiaAPIKey).instance;
 
   TextEditingController _orgSearchController = TextEditingController();
 
