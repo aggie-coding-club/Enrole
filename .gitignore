@@ -19,6 +19,15 @@
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
 #.vscode/
+<<<<<<< HEAD
+
+#Firebase
+google-services.json
+
+#API Keys
+keys.dart
+=======
+>>>>>>> master
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -30,6 +39,7 @@
 .pub-cache/
 .pub/
 /build/
+pubspec.lock
 
 # Web related
 lib/generated_plugin_registrant.dart
