@@ -19,7 +19,7 @@ class SearchOrgs extends StatefulWidget {
 
 class _SearchOrgsState extends State<SearchOrgs> {
 
-  Algolia _algolia = Algolia.init(applicationId: algoliaAppID, apiKey: algoiaAPIKey).instance;
+  Algolia _algolia = Algolia.init(applicationId: algoliaAppID, apiKey: algoliaAPIKey).instance;
 
   TextEditingController _orgSearchController = TextEditingController();
 
