@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'login/login_screen.dart';
 import 'register_user/register_user_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(InitApp());
@@ -14,16 +15,22 @@ class InitApp extends StatelessWidget {
     print('Inistializing Firebase');
     return FutureBuilder(
       future: Firebase.initializeApp(),
-      builder: (context, snapshot){
-        if(snapshot.hasError){
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
           print(snapshot.error);
           // TODO: Create a screen from app crash on initialization
-          return Text('Something went wrong', textDirection: TextDirection.ltr,);
-        } else if(snapshot.connectionState == ConnectionState.done){
+          return Text(
+            'Something went wrong',
+            textDirection: TextDirection.ltr,
+          );
+        } else if (snapshot.connectionState == ConnectionState.done) {
           return MyApp();
         } else {
           // TODO: Create a splash screen
-          return Text('Loading', textDirection: TextDirection.ltr,);
+          return Text(
+            'Loading',
+            textDirection: TextDirection.ltr,
+          );
         }
       },
     );

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:enrole_app_dev/builders/school_search.dart';
@@ -22,6 +23,9 @@ class GeneralInfoFormPage extends StatefulWidget {
 
 
 class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
+
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   String orgType;
   String school;
   String schoolSearch;
@@ -50,6 +54,8 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
             elevation: 6.0,
             child: Column(
               children: [
+                //TODO: Display the user's school in the header
+                Text('School'),
                 Container(
                   padding: EdgeInsets.all(12.0),
                   child: TextField(
@@ -163,27 +169,6 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                       ],
                     )
                         : Container(),
-                    Container(
-                      margin: EdgeInsets.all(12.0),
-                      child: TextField(
-                        onChanged: (value){
-                          setState(() {
-                            schoolSearch = value;
-                          });
-                        },
-                        maxLength: 30,
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Liberty University, t.u., etc.',
-                          labelText: 'School Name',
-                          fillColor: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ),
                   ],
                 )
                     : Container(

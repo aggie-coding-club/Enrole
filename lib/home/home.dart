@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_pages/register_organization/register_organization.dart';
 import 'home_pages/search_orgs/search_orgs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'home_pages/announcements/announcements.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -13,7 +13,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -28,18 +27,32 @@ class _HomeState extends State<Home> {
 
   Future<List<OrgNameIDRole>> _orgs;
 
+  String usersSchool;
+
+//TODO: User provider to constantly monitor and update user data
   Future<String> getRole(String orgID) async {
     String role;
     DocumentSnapshot docData;
-    try{
+    try {
       final user = _auth.currentUser;
-      if(user != null){
-        await _firestore.collection('orgs').doc(orgID).collection('members').doc(user.uid).get().then((DocumentSnapshot ds) {docData = ds;});
+      if (user != null) {
+        await _firestore
+            .collection('orgs')
+            .doc(orgID)
+            .collection('members')
+            .doc(user.uid)
+            .get()
+            .then((DocumentSnapshot ds) {
+          docData = ds;
+        });
         role = docData.data()['role'];
         return role;
       }
       return 'error';
-    }catch(e){print(e); return 'error';}
+    } catch (e) {
+      print(e);
+      return 'error';
+    }
   }
 
   Future<List<OrgNameIDRole>> getOrgs() async {
@@ -47,19 +60,38 @@ class _HomeState extends State<Home> {
     List<DocumentSnapshot> orgListDocs = [];
     String orgName;
     String id;
-    try{
+    try {
       final user = _auth.currentUser;
-      if(user != null){
-        await _firestore.collection('users').doc(user.uid).collection('orgs').get().then((value) {
+      if (user != null) {
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('orgs')
+            .get()
+            .then((value) {
           orgListDocs = value.docs;
           print(orgListDocs);
         });
-        for(var i = 0; i < orgListDocs.length; i++){
+        for (var i = 0; i < orgListDocs.length; i++) {
           String orgName = '';
           String role = '';
-          await _firestore.collection('orgs').doc(orgListDocs[i].data()['orgID']).get().then((value) {orgName = value.data()['orgName'];});
+          await _firestore
+              .collection('orgs')
+              .doc(orgListDocs[i].data()['orgID'])
+              .get()
+              .then((value) {
+            orgName = value.data()['orgName'];
+          });
           print('Got org name');
-          await _firestore.collection('orgs').doc(orgListDocs[i].data()['orgID']).collection('members').doc(user.uid).get().then((value) {role = value.data()['role'];});
+          await _firestore
+              .collection('orgs')
+              .doc(orgListDocs[i].data()['orgID'])
+              .collection('members')
+              .doc(user.uid)
+              .get()
+              .then((value) {
+            role = value.data()['role'];
+          });
           print('Got org role');
           final newOrg = OrgNameIDRole(
             id: orgListDocs[i].data()['orgID'],
@@ -73,30 +105,57 @@ class _HomeState extends State<Home> {
           _currentOrg = orgs[0];
         });
         return orgs;
-    }
+      }
       return [OrgNameIDRole(name: 'error', id: 'error', role: 'error')];
-    }catch(e){print(e); return [OrgNameIDRole(name: 'error', id: 'error', role: 'error')];}
+    } catch (e) {
+      print(e);
+      return [OrgNameIDRole(name: 'error', id: 'error', role: 'error')];
+    }
   }
 
-  Function bodyPageCallback(Widget newPage, String newPageTitle){
+  Function bodyPageCallback(Widget newPage, String newPageTitle) {
     setState(() {
       bodyPage = newPage;
       pageTitle = newPageTitle;
     });
   }
 
-  Function changeOrgCallback(OrgNameIDRole newOrg){
+  Function changeOrgCallback(OrgNameIDRole newOrg) {
     setState(() {
       _currentOrg = newOrg;
     });
   }
 
+  void getUsersSchool() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      try {
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .get()
+            .then((DocumentSnapshot doc) {
+          setState(() {
+            usersSchool = doc.data()['school'];
+          });
+        });
+      } catch (e) {
+        print(e);
+      }
+    } else{
+      setState(() {
+        usersSchool = 'ERROR: NO SCHOOL';
+      });
+    }
+  }
+
   @override
   void initState() {
+    super.initState();
     bodyPage = Overview();
     pageTitle = 'Overview';
     _orgs = getOrgs();
-    super.initState();
+    getUsersSchool();
   }
 
   @override
@@ -105,7 +164,7 @@ class _HomeState extends State<Home> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        centerTitle: true,
+        centerTitle: false,
         title: FittedBox(
           fit: BoxFit.contain,
           child: Text(
@@ -120,21 +179,28 @@ class _HomeState extends State<Home> {
         actions: [
           _currentOrg != null
               ? _currentOrg.role == 'admin'
-                ? Container(
-            margin: EdgeInsets.all(12.0),
-                  child: RaisedButton(
-            onPressed: (){},
-            child: Text('Admin Console'),
-          ),
-                )
-              : Container() : Container(),
+                  ? Container(
+                      margin: EdgeInsets.all(12.0),
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        child: Text('Admin Console'),
+                      ),
+                    )
+                  : Container()
+              : Container(),
         ],
         elevation: 0.0,
         backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Theme.of(context).appBarTheme.iconTheme.color),
+        iconTheme:
+            IconThemeData(color: Theme.of(context).appBarTheme.iconTheme.color),
       ),
       drawer: Drawer(
-        child: drawerItems(callback: bodyPageCallback, orgCallback: changeOrgCallback, currentOrg: _currentOrg, orgs: _orgs,),
+        child: drawerItems(
+          callback: bodyPageCallback,
+          orgCallback: changeOrgCallback,
+          currentOrg: _currentOrg,
+          orgs: _orgs,
+        ),
       ),
       body: bodyPage,
     );
@@ -142,7 +208,6 @@ class _HomeState extends State<Home> {
 }
 
 class drawerItems extends StatefulWidget {
-
   final Function callback;
   final Function orgCallback;
   final Widget bodyPage;
@@ -150,7 +215,13 @@ class drawerItems extends StatefulWidget {
   final String userName;
   final Future<List<OrgNameIDRole>> orgs;
 
-  drawerItems({this.callback, this.bodyPage, this.currentOrg, this.orgCallback, this.userName, this.orgs});
+  drawerItems(
+      {this.callback,
+      this.bodyPage,
+      this.currentOrg,
+      this.orgCallback,
+      this.userName,
+      this.orgs});
 
   @override
   _drawerItemsState createState() => _drawerItemsState();
@@ -182,40 +253,16 @@ class _drawerItemsState extends State<drawerItems> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          margin: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text('User 123134')
-                        ),
-                        SizedBox(width: 15.0,),
-                        FutureBuilder(
-                          future: this.widget.orgs,
-                          builder: (context, snapshot){
-                            if(snapshot.connectionState == ConnectionState.done){
-                              List<OrgNameIDRole> orgs = snapshot.data;
-                              return DropdownButton(
-                                icon: Icon(Icons.arrow_drop_down),
-                                value: this.widget.currentOrg,
-                                onChanged: (newOrg){
-                                  this.widget.orgCallback(newOrg);
-                                  Navigator.pop(context);
-                                },
-                                items: List.generate(orgs.length, (index){
-                                  return DropdownMenuItem(
-                                    value: orgs[index],
-                                    child: Text(orgs[index].name),
-                                  );
-                                }),
-                              );
-                            } else {return CircularProgressIndicator();}
-                          },
-                        ),
+                            margin: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text('User 123134')),
                       ],
                     ),
                   ),
                 ],
               ),
               IconButton(
-                onPressed: (){},
-                  icon: Icon(Icons.settings),
+                onPressed: () {},
+                icon: Icon(Icons.settings),
               ),
             ],
           ),
@@ -225,10 +272,20 @@ class _drawerItemsState extends State<drawerItems> {
         ),
         Card(
           child: ListTile(
-            title: Text('Home'),
+            title: Text('Overview'),
             trailing: Icon(Icons.home),
-            onTap: (){
+            onTap: () {
               this.widget.callback(Overview(), 'Overview');
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        Card(
+          child: ListTile(
+            title: Text('Announcements'),
+            trailing: Icon(Icons.announcement_outlined),
+            onTap: () {
+              this.widget.callback(Announcements(), 'Announcements');
               Navigator.pop(context);
             },
           ),
@@ -241,7 +298,7 @@ class _drawerItemsState extends State<drawerItems> {
           child: ListTile(
             title: Text('Search Orgs'),
             trailing: Icon(Icons.search),
-            onTap: (){
+            onTap: () {
               this.widget.callback(SearchOrgs(), 'Search Orgs');
               Navigator.pop(context);
             },
@@ -251,8 +308,12 @@ class _drawerItemsState extends State<drawerItems> {
           child: ListTile(
             title: Text('Register an Organization'),
             trailing: Icon(Icons.add),
-            onTap: (){
-              this.widget.callback(RegisterOrganizationPage(callback: this.widget.callback,), 'Register');
+            onTap: () {
+              this.widget.callback(
+                  RegisterOrganizationPage(
+                    callback: this.widget.callback,
+                  ),
+                  'Register');
               Navigator.pop(context);
             },
           ),
@@ -262,10 +323,9 @@ class _drawerItemsState extends State<drawerItems> {
   }
 }
 
-class OrgNameIDRole{
+class OrgNameIDRole {
   String name;
   String id;
   String role;
   OrgNameIDRole({this.name, this.id, this.role});
 }
-
