@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:algolia/algolia.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'org_public_profile.dart';
+import 'package:provider/provider.dart';
+import 'package:enrole_app_dev/services/user_data.dart';
 
 
 class SearchOrgs extends StatefulWidget {
@@ -44,10 +46,11 @@ class _SearchOrgsState extends State<SearchOrgs> {
   }
 
   
-  Future<List<Widget>> searchResults({String search, String school}) async {
+  Future<List<Widget>> searchResults({String search, BuildContext context}) async {
     List<Widget> tiles;
+    String school = context.read<UserData>().school;
     try{
-      AlgoliaQuerySnapshot querySnap = await _algolia.index('orgs').search(search).setFacetFilter('school:$school').getObjects();
+      AlgoliaQuerySnapshot querySnap = await _algolia.index('orgs').query(search).facetFilter('school:$school').getObjects();
       List<AlgoliaObjectSnapshot> results = querySnap.hits;
 
       tiles = List.generate(results.length, (orgIndex) {
@@ -168,25 +171,6 @@ class _SearchOrgsState extends State<SearchOrgs> {
       },
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                child: FlatButton(
-                  child: Row(
-                    children: [
-                      Icon(Icons.location_on),
-                      SizedBox(width: 4.0,),
-                      Text(selectedSchool == null ? 'Select a school' : selectedSchool),
-                    ],
-                  ),
-                  onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context){return SchoolSearchPopup(setSchool: setSchool,);}));
-                  },
-                ),
-              ),
-            ],
-          ),
           Container(
             padding: EdgeInsets.all(14.0),
             height: 80.0,
@@ -197,16 +181,16 @@ class _SearchOrgsState extends State<SearchOrgs> {
                   setState(() {
                     searchQuery = value;
                     print('Hmm');
-                    orgTiles = searchResults(search: value, school: selectedSchool);
+                    orgTiles = searchResults(search: value, context: context);
                   });
                 }
               },
             ),
           ),
           Expanded(
-            child: searchQuery.length > 2 && selectedSchool != null
+            child: searchQuery.length > 2
                 ? FutureBuilder(
-                  future: searchResults(search: searchQuery, school: selectedSchool),
+                  future: searchResults(search: searchQuery, context: context),
                   builder: (context, snap){
                     if(snap.connectionState == ConnectionState.done){
                       print('Algolia called');

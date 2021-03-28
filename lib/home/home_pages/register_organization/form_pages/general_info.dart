@@ -15,15 +15,21 @@ class GeneralInfoFormPage extends StatefulWidget {
   final Function hidePageControllers;
   final Function showPageControllers;
 
-  GeneralInfoFormPage({this.orgName, this.orgType, this.school, this.showPageControllers, this.hidePageControllers, this.setName, this.setType, this.setSchool});
+  GeneralInfoFormPage(
+      {this.orgName,
+      this.orgType,
+      this.school,
+      this.showPageControllers,
+      this.hidePageControllers,
+      this.setName,
+      this.setType,
+      this.setSchool});
 
   @override
   _GeneralInfoFormPageState createState() => _GeneralInfoFormPageState();
 }
 
-
 class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
-
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   String orgType;
@@ -37,11 +43,10 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
   @override
   void initState() {
     super.initState();
-    if(this.widget.orgName != null){
+    if (this.widget.orgName != null) {
       nameController.text = this.widget.orgName;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +70,7 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                       color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
-                    onChanged: (value){
+                    onChanged: (value) {
                       this.widget.setName(value);
                     },
                     decoration: InputDecoration(
@@ -96,11 +101,50 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                           iconSize: 35.0,
                           underline: Container(),
                           items: [
-                            DropdownMenuItem(value: 'public', child: Card(color: Colors.lightGreen[200], child: Container(margin: EdgeInsets.all(12.0),child: Text('Public', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.green[700]),))),),
-                            DropdownMenuItem(value: 'private', child: Card(color: Colors.lightBlue[200], child: Container(margin: EdgeInsets.all(12.0),child: Text('Private', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.blue[700]),))),),
-                            DropdownMenuItem(value: 'application', child: Card(color: Colors.yellow[100], child: Container(margin: EdgeInsets.all(12.0),child: Text('Application', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.yellow[700]),))),),
+                            DropdownMenuItem(
+                              value: 'public',
+                              child: Card(
+                                  color: Colors.lightGreen[200],
+                                  child: Container(
+                                      margin: EdgeInsets.all(12.0),
+                                      child: Text(
+                                        'Public',
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green[700]),
+                                      ))),
+                            ),
+                            DropdownMenuItem(
+                              value: 'private',
+                              child: Card(
+                                  color: Colors.lightBlue[200],
+                                  child: Container(
+                                      margin: EdgeInsets.all(12.0),
+                                      child: Text(
+                                        'Private',
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.blue[700]),
+                                      ))),
+                            ),
+                            DropdownMenuItem(
+                              value: 'application',
+                              child: Card(
+                                  color: Colors.yellow[100],
+                                  child: Container(
+                                      margin: EdgeInsets.all(12.0),
+                                      child: Text(
+                                        'Application',
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.yellow[700]),
+                                      ))),
+                            ),
                           ],
-                          onChanged: (value){
+                          onChanged: (value) {
                             setState(() {
                               orgType = value;
                               this.widget.setType(value);
@@ -113,7 +157,7 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                           AntDesign.questioncircleo,
                           color: Theme.of(context).primaryColor,
                         ),
-                        onPressed: (){
+                        onPressed: () {
                           print('Help button pressed');
                         },
                       ),
@@ -122,74 +166,90 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                 ),
                 this.widget.school == null
                     ? Column(
-                  children: [
-                    schoolSearch != null && schoolSearch != ''
-                        ? Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: FutureBuilder(
-                            future: searchSchools(query: schoolSearch),
-                            builder: (context, snapshot){
-                              if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
-                                List<String> schools = snapshot.data;
-                                List<Widget> results = List<Widget>.generate(schools.length <= 7 ? schools.length : 7, (index) {
-                                  return Card(
-                                    child: ListTile(
-                                      title: Text(schools[index]),
-                                      onTap: (){
-                                        setState(() {
-                                          school = schools[index];
-                                          print(school);
-                                          this.widget.setSchool(school);
-                                          FocusScopeNode currentFocus = FocusScope.of(context);
-                                          if(!currentFocus.hasPrimaryFocus){
-                                            currentFocus.unfocus();
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  );
-                                });
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: results,
-                                );
-                              } else {
-                                return Row(
+                        children: [
+                          schoolSearch != null && schoolSearch != ''
+                              ? Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    CircularProgressIndicator(),
+                                    Expanded(
+                                      child: FutureBuilder(
+                                        future:
+                                            searchSchools(query: schoolSearch),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                                  ConnectionState.done &&
+                                              snapshot.hasData) {
+                                            List<String> schools =
+                                                snapshot.data;
+                                            List<Widget> results =
+                                                List<Widget>.generate(
+                                                    schools.length <= 7
+                                                        ? schools.length
+                                                        : 7, (index) {
+                                              return Card(
+                                                child: ListTile(
+                                                  title: Text(schools[index]),
+                                                  onTap: () {
+                                                    setState(() {
+                                                      school = schools[index];
+                                                      print(school);
+                                                      this
+                                                          .widget
+                                                          .setSchool(school);
+                                                      FocusScopeNode
+                                                          currentFocus =
+                                                          FocusScope.of(
+                                                              context);
+                                                      if (!currentFocus
+                                                          .hasPrimaryFocus) {
+                                                        currentFocus.unfocus();
+                                                      }
+                                                    });
+                                                  },
+                                                ),
+                                              );
+                                            });
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: results,
+                                            );
+                                          } else {
+                                            return Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                CircularProgressIndicator(),
+                                              ],
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ),
                                   ],
-                                );
-                              }
-                            },
+                                )
+                              : Container(),
+                        ],
+                      )
+                    : Container(
+                        margin: EdgeInsets.all(12.0),
+                        child: Card(
+                          elevation: 3.0,
+                          child: ListTile(
+                            leading: IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() {
+                                  school = null;
+                                  schoolSearch = null;
+                                  this.widget.setSchool(null);
+                                });
+                              },
+                            ),
+                            title: Text(this.widget.school),
                           ),
                         ),
-                      ],
-                    )
-                        : Container(),
-                  ],
-                )
-                    : Container(
-                  margin: EdgeInsets.all(12.0),
-                  child: Card(
-                    elevation: 3.0,
-                    child: ListTile(
-                      leading: IconButton(
-                        icon: Icon(Icons.clear),
-                        onPressed: (){
-                          setState(() {
-                            school = null;
-                            schoolSearch = null;
-                            this.widget.setSchool(null);
-                          });
-                        },
                       ),
-                      title: Text(this.widget.school),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

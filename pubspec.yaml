@@ -23,13 +23,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-    uses-material-design: true
   firebase_core: ^1.0.0
   firebase_auth: ^1.0.0
   cloud_firestore: ^1.0.0
   firebase_database: ^6.1.0
   firebase_storage: ^8.0.0
   cloud_functions: ^1.0.0
+  firebase_analytics: ^7.1.1 
   rxdart: ^0.26.0
   provider: ^5.0.0
   # geoflutterfire: ^2.1.0

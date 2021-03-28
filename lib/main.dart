@@ -1,9 +1,14 @@
 import 'package:enrole_app_dev/home/home.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'login/login_screen.dart';
 import 'register_user/register_user_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:enrole_app_dev/services/user_data.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:enrole_app_dev/services/globals.dart';
 
 void main() {
   runApp(InitApp());
@@ -24,7 +29,17 @@ class InitApp extends StatelessWidget {
             textDirection: TextDirection.ltr,
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
-          return MyApp();
+
+          FirebaseAuth _auth = FirebaseAuth.instance;
+
+          return MultiProvider(
+            child: MyApp(),
+            providers: [
+              StreamProvider<User>(create: (_) => FirebaseAuth.instance.authStateChanges(), initialData: null),
+              StreamProvider<UserData>(create: (_) => UserDatabaseService().streamUser(_auth.currentUser.uid), initialData: null,),
+              StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],)
+            ],
+          );
         } else {
           // TODO: Create a splash screen
           return Text(
@@ -59,6 +74,9 @@ class MyApp extends StatelessWidget {
         '/register-user': (context) => RegisterUserPage(),
         '/home': (context) => Home(),
       },
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: Global.analytics),
+      ],
     );
   }
 }

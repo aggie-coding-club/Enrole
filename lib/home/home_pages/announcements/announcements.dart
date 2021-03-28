@@ -6,10 +6,10 @@ class Announcements extends StatefulWidget {
 }
 
 class _AnnouncementsState extends State<Announcements> {
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text('Announcements Page'),
-    );
+    return Text('Announcement Page');
   }
 }
+

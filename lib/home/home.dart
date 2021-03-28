@@ -6,6 +6,9 @@ import 'home_pages/register_organization/register_organization.dart';
 import 'home_pages/search_orgs/search_orgs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'home_pages/announcements/announcements.dart';
+import 'builders/app_bar_actions.dart';
+import 'package:enrole_app_dev/services/user_data.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -21,11 +24,11 @@ class _HomeState extends State<Home> {
 
   String pageTitle;
 
-  OrgNameIDRole _currentOrg;
+  JoinedOrg _currentOrg;
 
   String _role;
 
-  Future<List<OrgNameIDRole>> _orgs;
+  Future<List<JoinedOrg>> _orgs;
 
   String usersSchool;
 
@@ -55,8 +58,8 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<List<OrgNameIDRole>> getOrgs() async {
-    List<OrgNameIDRole> orgs = [];
+  Future<List<JoinedOrg>> getOrgs() async {
+    List<JoinedOrg> orgs = [];
     List<DocumentSnapshot> orgListDocs = [];
     String orgName;
     String id;
@@ -93,10 +96,10 @@ class _HomeState extends State<Home> {
             role = value.data()['role'];
           });
           print('Got org role');
-          final newOrg = OrgNameIDRole(
-            id: orgListDocs[i].data()['orgID'],
-            name: orgName,
-            role: role,
+          final newOrg = JoinedOrg(
+            orgID: orgListDocs[i].data()['orgID'],
+            orgName: orgName,
+            userRole: role,
           );
           print('Bout to add this hoe');
           orgs.add(newOrg);
@@ -104,12 +107,13 @@ class _HomeState extends State<Home> {
         setState(() {
           _currentOrg = orgs[0];
         });
+
         return orgs;
       }
-      return [OrgNameIDRole(name: 'error', id: 'error', role: 'error')];
+      return [JoinedOrg(orgName: 'error', orgID: 'error', userRole: 'error')];
     } catch (e) {
       print(e);
-      return [OrgNameIDRole(name: 'error', id: 'error', role: 'error')];
+      return [JoinedOrg(orgName: 'error', orgID: 'error', userRole: 'error')];
     }
   }
 
@@ -120,7 +124,7 @@ class _HomeState extends State<Home> {
     });
   }
 
-  Function changeOrgCallback(OrgNameIDRole newOrg) {
+  Function changeOrgCallback(JoinedOrg newOrg) {
     setState(() {
       _currentOrg = newOrg;
     });
@@ -142,7 +146,7 @@ class _HomeState extends State<Home> {
       } catch (e) {
         print(e);
       }
-    } else{
+    } else {
       setState(() {
         usersSchool = 'ERROR: NO SCHOOL';
       });
@@ -156,6 +160,8 @@ class _HomeState extends State<Home> {
     pageTitle = 'Overview';
     _orgs = getOrgs();
     getUsersSchool();
+    context.read<UserData>();
+    context.read<List<JoinedOrg>>();
   }
 
   @override
@@ -178,7 +184,7 @@ class _HomeState extends State<Home> {
         ),
         actions: [
           _currentOrg != null
-              ? _currentOrg.role == 'admin'
+              ? _currentOrg.userRole == 'admin'
                   ? Container(
                       margin: EdgeInsets.all(12.0),
                       child: ElevatedButton(
@@ -188,6 +194,42 @@ class _HomeState extends State<Home> {
                     )
                   : Container()
               : Container(),
+              Container(
+                margin: EdgeInsets.fromLTRB(9.0, 0.0, 10.0, 0.0),
+                child: Center(
+                  child: FutureBuilder(
+                    future: _orgs,
+                    builder: (context, snapshot) {
+                      if(snapshot.connectionState == ConnectionState.done){
+                      List<JoinedOrg> orgList = snapshot.data;
+
+                      return PopupMenuButton(
+                        onSelected: (value){
+                          if(value == 999){
+                            setState(() {
+                              bodyPage = SearchOrgs();
+                            });
+                          }
+                        },
+                        padding: EdgeInsets.all(0.0),
+                        elevation: 2.0,
+                        offset: Offset(50, 50),
+                        iconSize: 30.0,
+                        icon: Icon(Icons.add_circle_outline_sharp),
+                        itemBuilder: (context){
+                          return orgListMenuItems(context);
+                        },
+                        initialValue: 0,
+                      );
+
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                      
+                    }
+                  ),
+                ),
+              ),
         ],
         elevation: 0.0,
         backgroundColor: Colors.white,
@@ -211,9 +253,9 @@ class drawerItems extends StatefulWidget {
   final Function callback;
   final Function orgCallback;
   final Widget bodyPage;
-  final OrgNameIDRole currentOrg;
+  final JoinedOrg currentOrg;
   final String userName;
-  final Future<List<OrgNameIDRole>> orgs;
+  final Future<List<JoinedOrg>> orgs;
 
   drawerItems(
       {this.callback,
@@ -228,6 +270,9 @@ class drawerItems extends StatefulWidget {
 }
 
 class _drawerItemsState extends State<drawerItems> {
+
+FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -254,7 +299,7 @@ class _drawerItemsState extends State<drawerItems> {
                       children: [
                         Container(
                             margin: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text('User 123134')),
+                            child: Text(_auth.currentUser.email)),
                       ],
                     ),
                   ),
@@ -323,9 +368,3 @@ class _drawerItemsState extends State<drawerItems> {
   }
 }
 
-class OrgNameIDRole {
-  String name;
-  String id;
-  String role;
-  OrgNameIDRole({this.name, this.id, this.role});
-}
