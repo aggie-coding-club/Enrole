@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:enrole_app_dev/builders/school_search.dart';
+import 'package:enrole_app_dev/builders/match_domain_to_school.dart';
 import 'package:http/http.dart';
+import 'package:enrole_app_dev/home/home.dart';
 
 class RegisterUserPage extends StatefulWidget {
   @override
@@ -22,28 +24,17 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
 
   RegExp exp = RegExp(r"(\w+\.edu)");
 
+  Iterable<RegExpMatch> domain;
+
+  Widget matchedSchool;
+
+  Future<String> matchingSchoolName;
+
   final _formKey = GlobalKey<FormState>();
 
   Icon _passwordsMatchIcon;
 
-  void attemptRegistration(List<bool> infoComplete) async {
-    // Registers user if information checks out
-    if (!infoComplete.contains(false)) {
-      try {
-        await _auth.createUserWithEmailAndPassword(
-            email: _email, password: _password2);
-        final user = _auth.currentUser;
-        await _firestore.collection('users').doc(user.uid).set({
-          // Saves the users email and joining date under their profile
-          'email': _email,
-          'joined': DateTime.now().toString(),
-        });
-        Navigator.pushNamed(context, '/home'); // Navigates to the home page
-      } catch (e) {
-        print(e);
-      }
-    }
-  }
+  void searchForMatchingSchools() {}
 
   @override
   void initState() {
@@ -57,27 +48,30 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
     super.initState();
   }
 
+  void signupUser() async {
+    print("Signing up user");
+    if (_formKey.currentState.validate()) {
+      try {
+        final String finalSchool = await matchDomainToSchool(_email);
+        await _auth.createUserWithEmailAndPassword(
+            email: _email, password: _password2);
+        final user = _auth.currentUser;
+        await _firestore.collection('users').doc(user.uid).set({
+          'joined': DateTime.now(),
+          'school': finalSchool,
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Home()),
+        );
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    Iterable<RegExpMatch> domain = exp.allMatches(_email);
-
-    Future<String> matchingSchoolName;
-
-    if(domain.length ==1){
-      print('Search Initiated');
-      matchingSchoolName = searchSchools(query: domain.first[0].toString());
-    }
-    
-
-    List<bool> infoComplete = [
-      _email.isNotEmpty,
-      _email != null,
-      _password1 == _password2,
-      _password2 != null,
-      _password2.length > 5
-    ]; // List of booleans to determine data format is correct
-
     return Scaffold(
       body: SafeArea(
         child: Form(
@@ -88,11 +82,28 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                 onChanged: (value) {
                   setState(() {
                     _email = value;
+                    Iterable<RegExpMatch> domain = exp.allMatches(_email);
+                    if (domain.length == 1) {
+                      print('Search Initiated');
+                      matchingSchoolName = matchDomainToSchool(_email);
+                      matchedSchool = matchedSchoolText(matchingSchoolName);
+                    } else if (domain.length == 0) {
+                      matchedSchool = null;
+                      matchingSchoolName = null;
+                    }
                   });
                 },
                 validator: (value) {
+                  print("Signup With Email: $matchingSchoolName");
+                  Iterable<RegExpMatch> domain = exp.allMatches(value);
                   if (value.isEmpty) {
                     return 'Please input text';
+                  }
+                  if (domain.length == 0) {
+                    return 'Please enter a valid school email (email@college.edu)';
+                  }
+                  if (matchingSchoolName == null) {
+                    return 'No universities match that domain';
                   }
                   return null;
                 },
@@ -107,6 +118,9 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                   if (value.isEmpty) {
                     return 'Please input text';
                   }
+                  if (value.length <= 6) {
+                    return 'Please input a password longer than 6 characters';
+                  }
                   return null;
                 },
               ),
@@ -120,29 +134,39 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                   if (value.isEmpty) {
                     return 'Please input text';
                   }
+                  if (value.length <= 6) {
+                    return 'Please input a password longer than 6 characters';
+                  }
                   return null;
                 },
               ),
-              domain.length == 1 ? FutureBuilder(
-                future: searchSchools(query: domain.first[0].toString()),
-                builder: (context, snapshot){
-                  String school = snapshot.data;
-                  print('Data: ${snapshot.data}');
-                  if(snapshot.connectionState == ConnectionState.done){
-                    if(school != null){
-                      return Text(school);
-                    } else {
-                      return Text('No School Found');
-                    }
-                  } else {
-                    return CircularProgressIndicator();
-                  }
-                },
-              ) : Text('Waiting'),
+              matchedSchool != null
+                  ? matchedSchool
+                  : Text('No Universities match that domain'),
+              ElevatedButton(onPressed: signupUser, child: Text('Signup!')),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+Widget matchedSchoolText(Future<String> matchingSchoolName) {
+  return FutureBuilder(
+    future: matchingSchoolName,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        String school = snapshot.data;
+        print('Data: ${snapshot.data}');
+        if (school != null) {
+          return Text("Matched School:  $school");
+        } else {
+          return Text('No Universities match that domain');
+        }
+      } else {
+        return CircularProgressIndicator();
+      }
+    },
+  );
 }
