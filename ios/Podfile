@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-# platform :ios, '9.0'
+platform :ios, '10.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -28,6 +28,21 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 target 'Runner' do
+  pod 'Firebase/Core'
+  pod 'Firebase/Analytics'
+  pod 'Firebase/Firestore'
+  pod 'Firebase/Auth'
+  pod 'Firebase/Functions'
+  pod 'Firebase/Storage'
+  pod 'Firebase/Database'
+  pod 'Firebase/Messaging'
+  pod 'Firebase/RemoteConfig'
+  pod 'Firebase/DynamicLinks'
+  pod 'Firebase/MLVision'
+  pod 'Firebase/MLVisionBarcodeModel'
+  pod 'Firebase/MLVisionFaceModel'
+  pod 'Firebase/MLVisionLabelModel'
+  pod 'Firebase/MLVisionTextModel'
   use_frameworks!
   use_modular_headers!
 

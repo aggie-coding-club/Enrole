@@ -22,6 +22,7 @@
 
 #Firebase
 google-services.json
+GoogleService-Info.plist
 
 #API Keys
 keys.dart
