@@ -33,89 +33,6 @@ class _HomeState extends State<Home> {
   String usersSchool;
 
 //TODO: User provider to constantly monitor and update user data
-  Future<String> getRole(String orgID) async {
-    String role;
-    DocumentSnapshot docData;
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        await _firestore
-            .collection('orgs')
-            .doc(orgID)
-            .collection('members')
-            .doc(user.uid)
-            .get()
-            .then((DocumentSnapshot ds) {
-          docData = ds;
-        });
-        role = docData.data()['role'];
-        return role;
-      }
-      return 'error';
-    } catch (e) {
-      print(e);
-      return 'error';
-    }
-  }
-
-  Future<List<JoinedOrg>> getOrgs() async {
-    List<JoinedOrg> orgs = [];
-    List<DocumentSnapshot> orgListDocs = [];
-    String orgName;
-    String id;
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .collection('orgs')
-            .get()
-            .then((value) {
-          orgListDocs = value.docs;
-          print(orgListDocs);
-        });
-        for (var i = 0; i < orgListDocs.length; i++) {
-          String orgName = '';
-          String role = '';
-          await _firestore
-              .collection('orgs')
-              .doc(orgListDocs[i].data()['orgID'])
-              .get()
-              .then((value) {
-            orgName = value.data()['orgName'];
-          });
-          print('Got org name');
-          await _firestore
-              .collection('orgs')
-              .doc(orgListDocs[i].data()['orgID'])
-              .collection('members')
-              .doc(user.uid)
-              .get()
-              .then((value) {
-            role = value.data()['role'];
-          });
-          print('Got org role');
-          final newOrg = JoinedOrg(
-            orgID: orgListDocs[i].data()['orgID'],
-            orgName: orgName,
-            userRole: role,
-          );
-          print('Bout to add this hoe');
-          orgs.add(newOrg);
-        }
-        setState(() {
-          _currentOrg = orgs[0];
-        });
-
-        return orgs;
-      }
-      return [JoinedOrg(orgName: 'error', orgID: 'error', userRole: 'error')];
-    } catch (e) {
-      print(e);
-      return [JoinedOrg(orgName: 'error', orgID: 'error', userRole: 'error')];
-    }
-  }
 
   Function bodyPageCallback(Widget newPage, String newPageTitle) {
     setState(() {
@@ -130,36 +47,11 @@ class _HomeState extends State<Home> {
     });
   }
 
-  void getUsersSchool() async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      try {
-        await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .get()
-            .then((DocumentSnapshot doc) {
-          setState(() {
-            usersSchool = doc.data()['school'];
-          });
-        });
-      } catch (e) {
-        print(e);
-      }
-    } else {
-      setState(() {
-        usersSchool = 'ERROR: NO SCHOOL';
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     bodyPage = Overview();
     pageTitle = 'Overview';
-    _orgs = getOrgs();
-    getUsersSchool();
     context.read<UserData>();
     context.read<List<JoinedOrg>>();
   }
@@ -197,17 +89,15 @@ class _HomeState extends State<Home> {
               Container(
                 margin: EdgeInsets.fromLTRB(9.0, 0.0, 10.0, 0.0),
                 child: Center(
-                  child: FutureBuilder(
-                    future: _orgs,
-                    builder: (context, snapshot) {
-                      if(snapshot.connectionState == ConnectionState.done){
-                      List<JoinedOrg> orgList = snapshot.data;
-
-                      return PopupMenuButton(
+                  child: PopupMenuButton(
                         onSelected: (value){
-                          if(value == 999){
+                          if(value == 998){
                             setState(() {
                               bodyPage = SearchOrgs();
+                            });
+                          } if(value == 999){
+                            setState((){
+                              bodyPage = RegisterOrganizationPage();
                             });
                           }
                         },
@@ -220,14 +110,7 @@ class _HomeState extends State<Home> {
                           return orgListMenuItems(context);
                         },
                         initialValue: 0,
-                      );
-
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                      
-                    }
-                  ),
+                      ),
                 ),
               ),
         ],
@@ -288,14 +171,9 @@ FirebaseAuth _auth = FirebaseAuth.instance;
                   CircleAvatar(
                     radius: 40.0,
                   ),
-                  Divider(
-                    color: Colors.blueAccent,
-                    thickness: 4.0,
-                  ),
                   Container(
                     height: 30.0,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                             margin: EdgeInsets.symmetric(vertical: 8.0),
@@ -303,6 +181,7 @@ FirebaseAuth _auth = FirebaseAuth.instance;
                       ],
                     ),
                   ),
+                  Text(context.read<UserData>().school),
                 ],
               ),
               IconButton(
@@ -331,34 +210,6 @@ FirebaseAuth _auth = FirebaseAuth.instance;
             trailing: Icon(Icons.announcement_outlined),
             onTap: () {
               this.widget.callback(Announcements(), 'Announcements');
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        Divider(
-          thickness: 2.0,
-          color: Colors.grey[200],
-        ),
-        Card(
-          child: ListTile(
-            title: Text('Search Orgs'),
-            trailing: Icon(Icons.search),
-            onTap: () {
-              this.widget.callback(SearchOrgs(), 'Search Orgs');
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        Card(
-          child: ListTile(
-            title: Text('Register an Organization'),
-            trailing: Icon(Icons.add),
-            onTap: () {
-              this.widget.callback(
-                  RegisterOrganizationPage(
-                    callback: this.widget.callback,
-                  ),
-                  'Register');
               Navigator.pop(context);
             },
           ),

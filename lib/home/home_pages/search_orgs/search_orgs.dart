@@ -27,7 +27,6 @@ class _SearchOrgsState extends State<SearchOrgs> {
 
   ScrollController _scrollController = ScrollController();
 
-  String selectedSchool;
 
   Future<List<String>> schoolResults;
 
@@ -38,13 +37,6 @@ class _SearchOrgsState extends State<SearchOrgs> {
   String searchQuery = '';
 
   bool typing = false;
-
-  Function setSchool (String school){
-    setState(() {
-      selectedSchool = school;
-    });
-  }
-
   
   Future<List<Widget>> searchResults({String search, BuildContext context}) async {
     List<Widget> tiles;

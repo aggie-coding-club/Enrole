@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:enrole_app_dev/builders/school_search.dart';
+import 'package:provider/provider.dart';
+import 'package:enrole_app_dev/services/user_data.dart';
 
 class GeneralInfoFormPage extends StatefulWidget {
   final Function setName;
@@ -58,27 +60,41 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
           child: Material(
             elevation: 6.0,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 //TODO: Display the user's school in the header
-                Text('School'),
                 Container(
                   padding: EdgeInsets.all(12.0),
-                  child: TextField(
-                    controller: nameController,
-                    maxLength: 30,
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    onChanged: (value) {
-                      this.widget.setName(value);
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Apple pie lovers, Engineers anonymous, etc.',
-                      labelText: 'Organization Name (Min. 3 characters)',
-                      fillColor: Theme.of(context).primaryColor,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Register an organization under: ',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 18.0, fontWeight: FontWeight.bold),
+                      ),
+                      Text(context.read<UserData>().school),
+                      SizedBox(height: 12.0),
+                      TextField(
+                        controller: nameController,
+                        maxLength: 30,
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        onChanged: (value) {
+                          this.widget.setName(value);
+                        },
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText:
+                              'Apple pie lovers, Engineers anonymous, etc.',
+                          labelText: 'Organization Name (Min. 3 characters)',
+                          fillColor: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Center(

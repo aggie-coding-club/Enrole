@@ -23,11 +23,12 @@ List<PopupMenuEntry<int>> orgListMenuItems (BuildContext context){
 
   orgDropdown.add(
     PopupMenuItem(
-      value: 999,
+      value: 998,
       child: Row(
         children: [
-          Text(context.read<UserData>().joinedDate),
-          Icon(Icons.add),
+          Text("Find organizations"),
+          Expanded(child: Container(),),
+          Icon(Icons.search),
         ],
       ),
     )
@@ -37,8 +38,9 @@ List<PopupMenuEntry<int>> orgListMenuItems (BuildContext context){
       value: 999,
       child: Row(
         children: [
-          Text(context.read<UserData>().joinedDate),
-          Icon(Icons.add),
+          Text("Register an organization"),
+          Expanded(child: Container(),),
+          Icon(Icons.group_outlined),
         ],
       ),
     )
