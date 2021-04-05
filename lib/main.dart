@@ -1,4 +1,5 @@
 import 'package:enrole_app_dev/home/home.dart';
+import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'login/login_screen.dart';
@@ -37,7 +38,8 @@ class InitApp extends StatelessWidget {
             providers: [
               StreamProvider<User>(create: (_) => FirebaseAuth.instance.authStateChanges(), initialData: null),
               StreamProvider<UserData>(create: (_) => UserDatabaseService().streamUser(_auth.currentUser.uid), initialData: null,),
-              StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],)
+              StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],),
+              ChangeNotifierProvider<CurrentPage>(create: (_) => CurrentPage(),)
             ],
           );
         } else {
@@ -78,5 +80,24 @@ class MyApp extends StatelessWidget {
         FirebaseAnalyticsObserver(analytics: Global.analytics),
       ],
     );
+  }
+}
+
+class CurrentPage with ChangeNotifier {
+  Widget _pageWidget = Overview();
+  String _pageTitle = 'Overview';
+
+  get pageWidget => _pageWidget;
+
+  get pageTitle => _pageTitle;
+
+  set pageWidget(Widget widget){
+    _pageWidget = widget;
+    notifyListeners();
+  }
+
+  set pageTitle(String title){
+    _pageTitle = title;
+    notifyListeners();
   }
 }

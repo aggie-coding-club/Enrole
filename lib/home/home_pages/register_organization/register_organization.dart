@@ -1,3 +1,4 @@
+import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -10,6 +11,19 @@ import 'form_pages/payment_page.dart';
 import 'package:async/async.dart';
 import 'dart:io';
 import 'form_pages/verify_page.dart';
+import 'package:provider/provider.dart';
+
+class organizationInfo {
+  final String orgName;
+  final String orgBio;
+  final List<String> orgTags;
+  final String orgImage;
+  final String orgType;
+  final String school;
+
+  organizationInfo({this.orgName, this.orgBio, this.orgTags, this.orgImage, this.orgType, this.school});
+
+}
 
 class RegisterOrganizationPage extends StatefulWidget {
   final Function callback;
@@ -43,12 +57,6 @@ class _RegisterOrganizationPageState extends State<RegisterOrganizationPage> {
   Function setType (String type){
     setState(() {
       orgType = type;
-    });
-  }
-
-  Function setSchool(String value){
-    setState(() {
-      school = value;
     });
   }
 
@@ -151,7 +159,7 @@ class _RegisterOrganizationPageState extends State<RegisterOrganizationPage> {
     icon1Color = Colors.white;
     icon2Color = Colors.black;
     icon3Color = Colors.black;
-
+    school = context.read<UserData>().school;
   }
 
   void dispose(){
@@ -160,98 +168,101 @@ class _RegisterOrganizationPageState extends State<RegisterOrganizationPage> {
   }
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: (){
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if(!currentFocus.hasPrimaryFocus){
-          currentFocus.unfocus();
-          Future.delayed(Duration(milliseconds: 100), showPageControllers);
-        }
-      },
-      child: Stack(
-        children: [
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.all(12.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 200),
-                      decoration: BoxDecoration(
-                        color: icon1BackgroundColor,
-                        borderRadius: BorderRadius.circular(20.0),
+    return Provider(
+      create: (_) => organizationInfo(),
+          child: GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if(!currentFocus.hasPrimaryFocus){
+            currentFocus.unfocus();
+            Future.delayed(Duration(milliseconds: 100), showPageControllers);
+          }
+        },
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 200),
+                        decoration: BoxDecoration(
+                          color: icon1BackgroundColor,
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        height: 40.0,
+                        width: 40.0,
+                        child: Icon(Icons.info_outline, color: icon1Color,),
                       ),
-                      height: 40.0,
-                      width: 40.0,
-                      child: Icon(Icons.info_outline, color: icon1Color,),
-                    ),
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 200),
-                      decoration: BoxDecoration(
-                        color: icon2BackgroundColor,
-                        borderRadius: BorderRadius.circular(20.0),
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 200),
+                        decoration: BoxDecoration(
+                          color: icon2BackgroundColor,
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        height: 40.0,
+                        width: 40.0,
+                        child: Icon(Icons.art_track, color: icon2Color,),
                       ),
-                      height: 40.0,
-                      width: 40.0,
-                      child: Icon(Icons.art_track, color: icon2Color,),
-                    ),
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 200),
-                      decoration: BoxDecoration(
-                        color: icon3BackgroundColor,
-                        borderRadius: BorderRadius.circular(20.0),
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 200),
+                        decoration: BoxDecoration(
+                          color: icon3BackgroundColor,
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        height: 40.0,
+                        width: 40.0,
+                        child: Icon(Icons.check, color: icon3Color,),
                       ),
-                      height: 40.0,
-                      width: 40.0,
-                      child: Icon(Icons.check, color: icon3Color,),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: PageView(
-                  onPageChanged: (pageNum) async {
-                    FocusScopeNode currentFocus = FocusScope.of(context);
-                    if(!currentFocus.hasPrimaryFocus){
-                      currentFocus.unfocus();
-                      await Future.delayed(Duration(milliseconds: 100), showPageControllers);
-                    }
-                    switch(pageNum){
-                      case 0: {
-                        setState(() {
-                          currentPageControllers = Page0Controllers(_pageController);
-                          pageIconController(0);
-                        });
-                      } break;
-                      case 1: {
-                        setState(() {
-                          currentPageControllers = Page1Controllers(_pageController);
-                          pageIconController(1);
-                        });
-                      } break;
-                      case 2: {
-                        setState(() {
-                          currentPageControllers = Page2Controllers(_pageController);
-                          pageIconController(2);
-                        });
+                Expanded(
+                  child: PageView(
+                    onPageChanged: (pageNum) async {
+                      FocusScopeNode currentFocus = FocusScope.of(context);
+                      if(!currentFocus.hasPrimaryFocus){
+                        currentFocus.unfocus();
+                        await Future.delayed(Duration(milliseconds: 100), showPageControllers);
                       }
-                    }
-                  },
-                  controller: _pageController,
-                  physics: BouncingScrollPhysics(),
-                  children: [
-                    GeneralInfoFormPage(showPageControllers: showPageControllers, hidePageControllers: hidePageControllers, setName: setName, setType: setType, setSchool: setSchool, orgName: orgName, orgType: orgType, school: school,),
-                    OrgProfileFormPage(setImage: setImage, setBio: setBio, setTags: setTags, image: imageFile, bio: bio, tags: tags, hidePageControllers: hidePageControllers, showPageControllers: showPageControllers),
-                    VerifyPage(homeCallback: this.widget.callback, orgName: orgName, orgType: orgType, school: school, imageFile: imageFile, bio: bio, tags: tags,),
-                  ],
+                      switch(pageNum){
+                        case 0: {
+                          setState(() {
+                            currentPageControllers = Page0Controllers(_pageController);
+                            pageIconController(0);
+                          });
+                        } break;
+                        case 1: {
+                          setState(() {
+                            currentPageControllers = Page1Controllers(_pageController);
+                            pageIconController(1);
+                          });
+                        } break;
+                        case 2: {
+                          setState(() {
+                            currentPageControllers = Page2Controllers(_pageController);
+                            pageIconController(2);
+                          });
+                        }
+                      }
+                    },
+                    controller: _pageController,
+                    physics: BouncingScrollPhysics(),
+                    children: [
+                      GeneralInfoFormPage(showPageControllers: showPageControllers, hidePageControllers: hidePageControllers, setName: setName, setType: setType, orgName: orgName, orgType: orgType, school: school,),
+                      OrgProfileFormPage(setImage: setImage, setBio: setBio, setTags: setTags, image: imageFile, bio: bio, tags: tags, hidePageControllers: hidePageControllers, showPageControllers: showPageControllers),
+                      VerifyPage(homeCallback: this.widget.callback, orgName: orgName, orgType: orgType, school: school, imageFile: imageFile, bio: bio, tags: tags,),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          currentPageControllers,
-        ],
+              ],
+            ),
+            currentPageControllers,
+          ],
+        ),
       ),
     );
   }

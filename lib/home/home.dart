@@ -9,6 +9,7 @@ import 'home_pages/announcements/announcements.dart';
 import 'builders/app_bar_actions.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:provider/provider.dart';
+import 'package:enrole_app_dev/main.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -31,6 +32,8 @@ class _HomeState extends State<Home> {
   Future<List<JoinedOrg>> _orgs;
 
   String usersSchool;
+
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
 //TODO: User provider to constantly monitor and update user data
 
@@ -58,104 +61,103 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        centerTitle: false,
-        title: FittedBox(
-          fit: BoxFit.contain,
-          child: Text(
-            pageTitle,
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontSize: 22.0,
-              fontWeight: FontWeight.bold,
+    return Consumer<CurrentPage>(
+      builder: (_, currentPage, __) => Scaffold(
+        key: _scaffoldKey,
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(70.0),
+          child: AppBar(
+            centerTitle: false,
+            leading: IconButton(
+                icon: Icon(Icons.menu,
+                    size: 35.0, color: Theme.of(context).primaryColor),
+                onPressed: () {
+                  _scaffoldKey.currentState.openDrawer();
+                }),
+            title: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                currentPage.pageTitle,
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          ),
-        ),
-        actions: [
-          _currentOrg != null
-              ? _currentOrg.userRole == 'admin'
-                  ? Container(
-                      margin: EdgeInsets.all(12.0),
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        child: Text('Admin Console'),
-                      ),
-                    )
-                  : Container()
-              : Container(),
+            actions: [
+              _currentOrg != null
+                  ? _currentOrg.userRole == 'admin'
+                      ? Container(
+                          margin: EdgeInsets.all(12.0),
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            child: Text('Admin Console'),
+                          ),
+                        )
+                      : Container()
+                  : Container(),
               Container(
                 margin: EdgeInsets.fromLTRB(9.0, 0.0, 10.0, 0.0),
                 child: Center(
                   child: PopupMenuButton(
-                        onSelected: (value){
-                          if(value == 998){
-                            setState(() {
-                              bodyPage = SearchOrgs();
-                            });
-                          } if(value == 999){
-                            setState((){
-                              bodyPage = RegisterOrganizationPage();
-                            });
-                          }
-                        },
-                        padding: EdgeInsets.all(0.0),
-                        elevation: 2.0,
-                        offset: Offset(50, 50),
-                        iconSize: 30.0,
-                        icon: Icon(Icons.add_circle_outline_sharp),
-                        itemBuilder: (context){
-                          return orgListMenuItems(context);
-                        },
-                        initialValue: 0,
-                      ),
+                    onSelected: (value) {
+                      if (value == 998) {
+                        setState(() {
+                          var currentPage =
+                              Provider.of<CurrentPage>(context, listen: false);
+                          currentPage.pageWidget = SearchOrgs();
+                          currentPage.pageTitle = 'Search your School\'s Orgs';
+                        });
+                      }
+                      if (value == 999) {
+                        setState(() {
+                          var currentPage =
+                              Provider.of<CurrentPage>(context, listen: false);
+                          currentPage.pageWidget = RegisterOrganizationPage();
+                          currentPage.pageTitle = 'Register an Organization';
+                        });
+                      }
+                    },
+                    padding: EdgeInsets.all(0.0),
+                    elevation: 2.0,
+                    offset: Offset(50, 50),
+                    iconSize: 30.0,
+                    icon: Icon(Icons.add_circle_outline_sharp),
+                    itemBuilder: (context) {
+                      return orgListMenuItems(context);
+                    },
+                    initialValue: 0,
+                  ),
                 ),
               ),
-        ],
-        elevation: 0.0,
-        backgroundColor: Colors.white,
-        iconTheme:
-            IconThemeData(color: Theme.of(context).appBarTheme.iconTheme.color),
-      ),
-      drawer: Drawer(
-        child: drawerItems(
-          callback: bodyPageCallback,
-          orgCallback: changeOrgCallback,
-          currentOrg: _currentOrg,
-          orgs: _orgs,
+            ],
+            elevation: 5.0,
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(
+                color: Theme.of(context).appBarTheme.iconTheme.color),
+          ),
         ),
+        drawer: Drawer(
+          child: drawerItems(),
+        ),
+        body: currentPage.pageWidget,
       ),
-      body: bodyPage,
     );
   }
 }
 
 class drawerItems extends StatefulWidget {
-  final Function callback;
-  final Function orgCallback;
-  final Widget bodyPage;
-  final JoinedOrg currentOrg;
-  final String userName;
-  final Future<List<JoinedOrg>> orgs;
-
-  drawerItems(
-      {this.callback,
-      this.bodyPage,
-      this.currentOrg,
-      this.orgCallback,
-      this.userName,
-      this.orgs});
 
   @override
   _drawerItemsState createState() => _drawerItemsState();
 }
 
 class _drawerItemsState extends State<drawerItems> {
-
-FirebaseAuth _auth = FirebaseAuth.instance;
-
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -199,7 +201,7 @@ FirebaseAuth _auth = FirebaseAuth.instance;
             title: Text('Overview'),
             trailing: Icon(Icons.home),
             onTap: () {
-              this.widget.callback(Overview(), 'Overview');
+              Provider.of<CurrentPage>(context);
               Navigator.pop(context);
             },
           ),
@@ -209,7 +211,9 @@ FirebaseAuth _auth = FirebaseAuth.instance;
             title: Text('Announcements'),
             trailing: Icon(Icons.announcement_outlined),
             onTap: () {
-              this.widget.callback(Announcements(), 'Announcements');
+              var currentPage = Provider.of<CurrentPage>(context, listen: false);
+              currentPage.pageWidget = Announcements();
+              currentPage.pageTitle = 'Announcements';
               Navigator.pop(context);
             },
           ),
@@ -218,4 +222,3 @@ FirebaseAuth _auth = FirebaseAuth.instance;
     );
   }
 }
-
