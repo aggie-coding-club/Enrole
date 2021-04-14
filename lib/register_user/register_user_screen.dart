@@ -49,7 +49,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
   }
 
   void signupUser() async {
-    print("Signing up user");
+    print("Signing up user now");
     if (_formKey.currentState.validate()) {
       try {
         final String finalSchool = await matchDomainToSchool(_email);
