@@ -5,6 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'dart:io';
+import 'package:provider/provider.dart';
+import 'package:enrole_app_dev/main.dart';
 
 class VerifyPage extends StatefulWidget {
 
@@ -38,8 +40,9 @@ class _VerifyPageState extends State<VerifyPage> {
 
   bool publishing = false;
 
-  Future<Widget> isEmailVerified() async {
-    final user = _auth.currentUser;
+  Future<Widget> isEmailVerified(BuildContext context) async {
+    try{
+      final user = context.watch<User>();
     if(user.emailVerified){
       setState(() {
         isEmailVerifiedVar = true;
@@ -72,11 +75,11 @@ class _VerifyPageState extends State<VerifyPage> {
               onPressed: (){
                 print('test ${this.widget.school}');
                 setState(() {
-                  emailVerifiedWidget = isEmailVerified();
+                  emailVerifiedWidget = isEmailVerified(context);
                 });
               },
             ),
-            RaisedButton(
+            ElevatedButton(
               child: Text('Verify'),
               onPressed: (){
                 user.sendEmailVerification();
@@ -86,6 +89,7 @@ class _VerifyPageState extends State<VerifyPage> {
         ),
       );
     }
+    }catch(e){print(e);}
   }
 
   void publishOrgToFirestore({String orgName, String orgType, String school, File image, String bio, List<String> tags}) async {
@@ -111,16 +115,26 @@ class _VerifyPageState extends State<VerifyPage> {
           'role': 'admin',
           'joined': DateTime.now(),
         });
-        this.widget.homeCallback(Overview(), 'Overview');
+        var currentPage = Provider.of<CurrentPage>(context, listen: false);
+        currentPage.pageWidget = Overview();
+        currentPage.pageTitle = 'Overview';
       }
-    }catch(e){print('frick');}
+    }catch(e){print(e);}
   }
 
 
   @override
   void initState() {
     super.initState();
-    emailVerifiedWidget = isEmailVerified();
+    
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+
+    emailVerifiedWidget = isEmailVerified(context);
     publishing = false;
   }
   @override
@@ -227,7 +241,7 @@ class _VerifyPageState extends State<VerifyPage> {
                   children: [
                     Container(
                       padding: EdgeInsets.all(12.0),
-                      child: publishing == false ? RaisedButton(
+                      child: publishing == false ? ElevatedButton(
                         onPressed: isEverythingVerified.contains(false) ? null
                         : (){
                           setState(() {

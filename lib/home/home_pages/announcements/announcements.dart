@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Announcement {
   String title = 'Error';
@@ -75,5 +76,3 @@ class _AnnouncementsState extends State<Announcements> {
             return CircularProgressIndicator();
           }
         });
-  }
-}
