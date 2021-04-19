@@ -86,36 +86,37 @@ class _HomeState extends State<Home> {
                     )
                   : Container()
               : Container(),
-              Container(
-                margin: EdgeInsets.fromLTRB(9.0, 0.0, 10.0, 0.0),
-                child: Center(
-                  child: PopupMenuButton(
-                        onSelected: (value){
-                          if(value == 998){
-                            setState(() {
-                              bodyPage = SearchOrgs();
-                            });
-                          } if(value == 999){
-                            setState((){
-                              bodyPage = RegisterOrganizationPage();
-                            });
-                          }
-                        },
-                        padding: EdgeInsets.all(0.0),
-                        elevation: 2.0,
-                        offset: Offset(50, 50),
-                        iconSize: 30.0,
-                        icon: Icon(Icons.add_circle_outline_sharp),
-                        itemBuilder: (context){
-                          return orgListMenuItems(context);
-                        },
-                        initialValue: 0,
-                      ),
-                ),
+          Container(
+            margin: EdgeInsets.fromLTRB(9.0, 0.0, 10.0, 0.0),
+            child: Center(
+              child: PopupMenuButton(
+                onSelected: (value) {
+                  if (value == 998) {
+                    setState(() {
+                      bodyPage = SearchOrgs();
+                    });
+                  }
+                  if (value == 999) {
+                    setState(() {
+                      bodyPage = RegisterOrganizationPage();
+                    });
+                  }
+                },
+                padding: EdgeInsets.all(0.0),
+                elevation: 2.0,
+                offset: Offset(50, 50),
+                iconSize: 30.0,
+                icon: Icon(Icons.add_circle_outline_sharp),
+                itemBuilder: (context) {
+                  return orgListMenuItems(context);
+                },
+                initialValue: 0,
               ),
+            ),
+          ),
         ],
         elevation: 0.0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.red,
         iconTheme:
             IconThemeData(color: Theme.of(context).appBarTheme.iconTheme.color),
       ),
@@ -153,8 +154,7 @@ class drawerItems extends StatefulWidget {
 }
 
 class _drawerItemsState extends State<drawerItems> {
-
-FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -218,4 +218,3 @@ FirebaseAuth _auth = FirebaseAuth.instance;
     );
   }
 }
-
