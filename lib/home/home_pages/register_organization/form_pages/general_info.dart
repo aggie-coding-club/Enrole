@@ -8,7 +8,6 @@ import 'package:enrole_app_dev/services/user_data.dart';
 class GeneralInfoFormPage extends StatefulWidget {
   final Function setName;
   final Function setType;
-  final Function setSchool;
 
   final String orgName;
   final String orgType;
@@ -17,15 +16,15 @@ class GeneralInfoFormPage extends StatefulWidget {
   final Function hidePageControllers;
   final Function showPageControllers;
 
-  GeneralInfoFormPage(
-      {this.orgName,
-      this.orgType,
-      this.school,
-      this.showPageControllers,
-      this.hidePageControllers,
-      this.setName,
-      this.setType,
-      this.setSchool});
+  GeneralInfoFormPage({
+    this.orgName,
+    this.orgType,
+    this.school,
+    this.showPageControllers,
+    this.hidePageControllers,
+    this.setName,
+    this.setType,
+  });
 
   @override
   _GeneralInfoFormPageState createState() => _GeneralInfoFormPageState();
@@ -145,20 +144,6 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                                             color: Colors.blue[700]),
                                       ))),
                             ),
-                            DropdownMenuItem(
-                              value: 'application',
-                              child: Card(
-                                  color: Colors.yellow[100],
-                                  child: Container(
-                                      margin: EdgeInsets.all(12.0),
-                                      child: Text(
-                                        'Application',
-                                        style: TextStyle(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.yellow[700]),
-                                      ))),
-                            ),
                           ],
                           onChanged: (value) {
                             setState(() {
@@ -180,92 +165,6 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                     ],
                   ),
                 ),
-                this.widget.school == null
-                    ? Column(
-                        children: [
-                          schoolSearch != null && schoolSearch != ''
-                              ? Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: FutureBuilder(
-                                        future:
-                                            searchSchools(query: schoolSearch),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                                  ConnectionState.done &&
-                                              snapshot.hasData) {
-                                            List<String> schools =
-                                                snapshot.data;
-                                            List<Widget> results =
-                                                List<Widget>.generate(
-                                                    schools.length <= 7
-                                                        ? schools.length
-                                                        : 7, (index) {
-                                              return Card(
-                                                child: ListTile(
-                                                  title: Text(schools[index]),
-                                                  onTap: () {
-                                                    setState(() {
-                                                      school = schools[index];
-                                                      print(school);
-                                                      this
-                                                          .widget
-                                                          .setSchool(school);
-                                                      FocusScopeNode
-                                                          currentFocus =
-                                                          FocusScope.of(
-                                                              context);
-                                                      if (!currentFocus
-                                                          .hasPrimaryFocus) {
-                                                        currentFocus.unfocus();
-                                                      }
-                                                    });
-                                                  },
-                                                ),
-                                              );
-                                            });
-                                            return Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: results,
-                                            );
-                                          } else {
-                                            return Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                CircularProgressIndicator(),
-                                              ],
-                                            );
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Container(),
-                        ],
-                      )
-                    : Container(
-                        margin: EdgeInsets.all(12.0),
-                        child: Card(
-                          elevation: 3.0,
-                          child: ListTile(
-                            leading: IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                setState(() {
-                                  school = null;
-                                  schoolSearch = null;
-                                  this.widget.setSchool(null);
-                                });
-                              },
-                            ),
-                            title: Text(this.widget.school),
-                          ),
-                        ),
-                      ),
               ],
             ),
           ),
