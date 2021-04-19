@@ -150,14 +150,13 @@ class _HomeState extends State<Home> {
 }
 
 class drawerItems extends StatefulWidget {
-
   @override
   _drawerItemsState createState() => _drawerItemsState();
 }
 
 class _drawerItemsState extends State<drawerItems> {
   FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -211,7 +210,8 @@ class _drawerItemsState extends State<drawerItems> {
             title: Text('Announcements'),
             trailing: Icon(Icons.announcement_outlined),
             onTap: () {
-              var currentPage = Provider.of<CurrentPage>(context, listen: false);
+              var currentPage =
+                  Provider.of<CurrentPage>(context, listen: false);
               currentPage.pageWidget = Announcements();
               currentPage.pageTitle = 'Announcements';
               Navigator.pop(context);

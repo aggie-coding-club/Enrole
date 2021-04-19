@@ -60,6 +60,30 @@ class _AnnouncementsState extends State<Announcements> {
     announcementData = announcementsData();
   }
 
+  Widget announcement(String title, String body) {
+    return Card(
+      child: ListTile(
+        title: Text(title),
+        subtitle: Text(body),
+      ),
+    );
+  }
+
+  Widget announcementTilesListView(List<Announcement> announcementsData) {
+    List<Widget> announcementTiles =
+        List.generate(announcementsData.length, (index) {
+      return Card(
+        child: ListTile(
+          title: Text(announcementsData[index].title),
+          subtitle: Text(announcementsData[index].body),
+        ),
+      );
+    });
+    return ListView(
+      children: announcementTiles,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -76,3 +100,5 @@ class _AnnouncementsState extends State<Announcements> {
             return CircularProgressIndicator();
           }
         });
+  }
+}
