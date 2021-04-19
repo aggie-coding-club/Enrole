@@ -30,16 +30,27 @@ class InitApp extends StatelessWidget {
             textDirection: TextDirection.ltr,
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
-
           FirebaseAuth _auth = FirebaseAuth.instance;
 
           return MultiProvider(
             child: MyApp(),
             providers: [
-              StreamProvider<User>(create: (_) => FirebaseAuth.instance.authStateChanges(), initialData: null),
-              StreamProvider<UserData>(create: (_) => UserDatabaseService().streamUser(_auth.currentUser.uid), initialData: null,),
-              StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],),
-              ChangeNotifierProvider<CurrentPage>(create: (_) => CurrentPage(),)
+              StreamProvider<User>(
+                  create: (_) => FirebaseAuth.instance.authStateChanges(),
+                  initialData: null),
+              StreamProvider<UserData>(
+                create: (_) =>
+                    UserDatabaseService().streamUser(_auth.currentUser.uid),
+                initialData: null,
+              ),
+              StreamProvider<List<JoinedOrg>>(
+                create: (_) => UserDatabaseService()
+                    .streamJoinedOrgs(_auth.currentUser.uid),
+                initialData: [],
+              ),
+              ChangeNotifierProvider<CurrentPage>(
+                create: (_) => CurrentPage(),
+              )
             ],
           );
         } else {
@@ -91,12 +102,12 @@ class CurrentPage with ChangeNotifier {
 
   get pageTitle => _pageTitle;
 
-  set pageWidget(Widget widget){
+  set pageWidget(Widget widget) {
     _pageWidget = widget;
     notifyListeners();
   }
 
-  set pageTitle(String title){
+  set pageTitle(String title) {
     _pageTitle = title;
     notifyListeners();
   }
