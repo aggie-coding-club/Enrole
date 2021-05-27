@@ -1,4 +1,5 @@
 import 'package:enrole_app_dev/home/home.dart';
+import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'login/login_screen.dart';
@@ -9,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:enrole_app_dev/services/globals.dart';
+import 'admin_console/admin_console_scaffold.dart';
 
 void main() {
   runApp(InitApp());
@@ -37,7 +39,9 @@ class InitApp extends StatelessWidget {
             providers: [
               StreamProvider<User>(create: (_) => FirebaseAuth.instance.authStateChanges(), initialData: null),
               StreamProvider<UserData>(create: (_) => UserDatabaseService().streamUser(_auth.currentUser.uid), initialData: null,),
-              StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],)
+              StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],),
+              ChangeNotifierProvider<CurrentPage>(create: (_) => CurrentPage(),),
+              ChangeNotifierProvider<CurrentOrg>(create: (_) => CurrentOrg(),)
             ],
           );
         } else {
@@ -54,6 +58,7 @@ class InitApp extends StatelessWidget {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -73,10 +78,65 @@ class MyApp extends StatelessWidget {
         '/': (context) => LoginScreen(),
         '/register-user': (context) => RegisterUserPage(),
         '/home': (context) => Home(),
+        '/admin-console': (context) => AdminConsole(),
       },
       navigatorObservers: [
         FirebaseAnalyticsObserver(analytics: Global.analytics),
       ],
     );
+  }
+}
+
+class CurrentOrg with ChangeNotifier{
+  JoinedOrg _org;
+
+  get org => _org;
+
+  set org(JoinedOrg org){
+    _org = org;
+    notifyListeners();
+  }
+
+  String getOrgURL (){
+    if (_org != null){
+      return _org.orgImageURL;
+    } else {
+      return "https://cdn4.iconfinder.com/data/icons/web-and-mobile-ui/24/UI-33-512.png";
+    }
+  }
+
+  String getUserRole(){
+    if (_org != null){
+      return _org.userRole;
+    } else {
+      return "member";
+    }
+  }
+
+  String getOrgID(){
+    if (_org != null){
+      return _org.orgID;
+    } else {
+      return "Error";
+    }
+  }
+}
+
+class CurrentPage with ChangeNotifier {
+  Widget _pageWidget = Overview();
+  String _pageTitle = 'Overview';
+
+  get pageWidget => _pageWidget;
+
+  get pageTitle => _pageTitle;
+
+  set pageWidget(Widget widget){
+    _pageWidget = widget;
+    notifyListeners();
+  }
+
+  set pageTitle(String title){
+    _pageTitle = title;
+    notifyListeners();
   }
 }
