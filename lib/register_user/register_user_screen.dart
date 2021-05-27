@@ -143,7 +143,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
               matchedSchool != null
                   ? matchedSchool
                   : Text('No Universities match that domain'),
-              ElevatedButton(onPressed: signupUser, child: Text('Signup!')),
+              ElevatedButton(onPressed: signupUser, child: Text('Register here')),
             ],
           ),
         ),

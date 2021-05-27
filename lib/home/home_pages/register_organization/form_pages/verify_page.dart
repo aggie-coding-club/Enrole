@@ -7,6 +7,7 @@ import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class VerifyPage extends StatefulWidget {
 
@@ -42,7 +43,7 @@ class _VerifyPageState extends State<VerifyPage> {
 
   Future<Widget> isEmailVerified(BuildContext context) async {
     try{
-      final user = context.watch<User>();
+      final user = _auth.currentUser;
     if(user.emailVerified){
       setState(() {
         isEmailVerifiedVar = true;
@@ -94,13 +95,18 @@ class _VerifyPageState extends State<VerifyPage> {
 
   void publishOrgToFirestore({String orgName, String orgType, String school, File image, String bio, List<String> tags}) async {
     try{
-      final user = _auth.currentUser;
+      print('Creating org...');
+      HttpsCallable createOrg = FirebaseFunctions.instance.httpsCallable('createOrg');
+      print('Got callable...');
+      //TODO: Make sure created organization can't override an existing one
       String orgID = uuid.v4().substring(0, 8);
+      final user = _auth.currentUser;
       if(user != null){
         await _storage.ref().child('orgs/$orgID/profileImage').putFile(image);
         final profileImage = await _storage.ref().child('orgs/$orgID/profileImage').getDownloadURL();
         final profileImageURL = profileImage.toString();
-        await _firestore.collection('orgs').doc(orgID).set({
+        print('Got here...');
+        await createOrg.call(<String, dynamic>{
           'orgName': orgName,
           'orgType': orgType,
           'school': school,
@@ -109,12 +115,30 @@ class _VerifyPageState extends State<VerifyPage> {
           'tags': tags,
           'owner': user.uid,
           'orgID': orgID,
+          'time': DateTime.now().toString(),
         });
-        await _firestore.collection('orgs').doc(orgID).collection('members').doc(user.uid).set({
-          'id': user.uid,
-          'role': 'admin',
-          'joined': DateTime.now(),
-        });
+        print('Invoked callable');
+        // await _firestore.collection('orgs').doc(orgID).set({
+        //   'orgName': orgName,
+        //   'orgType': orgType,
+        //   'school': school,
+        //   'profileImageURL': profileImageURL,
+        //   'bio': bio,
+        //   'tags': tags,
+        //   'owner': user.uid,
+        //   'orgID': orgID,
+        // });
+        // await _firestore.collection('orgs').doc(orgID).collection('members').doc(user.uid).set({
+        //   'userID': user.uid,
+        //   'role': 'admin',
+        //   'joined': DateTime.now(),
+        // });
+        // await _firestore.collection('users').doc(user.uid).collection('joinedOrgs').doc(orgID).set({
+        //   'orgName': orgName,
+        //   'orgImageURL': profileImageURL,
+        //   'orgID': orgID,
+        //   'userRole': 'admin',
+        // });
         var currentPage = Provider.of<CurrentPage>(context, listen: false);
         currentPage.pageWidget = Overview();
         currentPage.pageTitle = 'Overview';

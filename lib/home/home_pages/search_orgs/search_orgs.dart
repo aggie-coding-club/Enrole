@@ -111,7 +111,7 @@ class _SearchOrgsState extends State<SearchOrgs> {
         return GestureDetector(
           onTap: (){
             Navigator.push(context, MaterialPageRoute(builder: (context){
-              return OrgPublicProfile(orgData: results[orgIndex], image: image,);
+              return OrgPublicProfile(orgData: results[orgIndex], image: image, context: context,);
             }));
           },
           child: Card(

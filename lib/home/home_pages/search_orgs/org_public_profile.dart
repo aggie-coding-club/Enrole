@@ -1,8 +1,11 @@
+import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:algolia/algolia.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:enrole_app_dev/main.dart';
 
 class OrgPublicProfile extends StatefulWidget {
 
@@ -10,7 +13,9 @@ class OrgPublicProfile extends StatefulWidget {
 
   final ImageProvider image;
 
-  OrgPublicProfile({this.orgData, this.image});
+  final BuildContext context;
+
+  OrgPublicProfile({this.orgData, this.image, this.context});
 
   @override
   _OrgPublicProfileState createState() => _OrgPublicProfileState();
@@ -22,18 +27,24 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
 
   HttpsCallable _joinRequest = FirebaseFunctions.instance.httpsCallable('joinRequest');
 
-  Widget joinTile(String orgType){
+  Widget joinTile(String orgType, String orgID){
     String titleString;
 //      String subString;
     Color cardColor;
     Color textColor;
+
+    List<JoinedOrg> joinedOrgs = Provider.of<List<JoinedOrg>>(this.widget.context);
+    List<String> orgIDs = List.generate(joinedOrgs.length, (index) {
+      return joinedOrgs[index].orgID;
+    });
+
     switch(orgType){
       case 'public':{
         titleString = 'Join';
 //          subString = 'Press here to join';
         cardColor = Colors.lightGreen[200];
         textColor = Colors.green[800];
-      }break;
+      } break;
       case 'private':{
         titleString = 'Send join request';
 //          subString = 'Press here to request admission';
@@ -47,6 +58,13 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
         textColor = Colors.yellow[700];
       } break;
     }
+
+    if(orgIDs.contains(orgID)){
+      titleString = 'Leave';
+      cardColor = Colors.red[200];
+      textColor = Colors.red[800];
+    }
+
     return GestureDetector(
       onTap: (){
         print('Join');
@@ -243,7 +261,7 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                       Container(
                         height: 50.0,
                         padding: EdgeInsets.fromLTRB(14.0, 8.0, 14.0, 8.0),
-                        child: joinTile(this.widget.orgData.data['orgType']),
+                        child: joinTile(this.widget.orgData.data['orgType'], this.widget.orgData.data['orgID']),
                       ),
                       Container(
                         margin: EdgeInsets.all(14.0),
