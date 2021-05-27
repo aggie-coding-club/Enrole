@@ -43,7 +43,7 @@ class _VerifyPageState extends State<VerifyPage> {
 
   Future<Widget> isEmailVerified(BuildContext context) async {
     try{
-      final user = _auth.currentUser;
+      User user = _auth.currentUser;
     if(user.emailVerified){
       setState(() {
         isEmailVerifiedVar = true;

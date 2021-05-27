@@ -18,8 +18,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
-
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -44,7 +42,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Provider.of<CurrentOrg>(context, listen: false).org == null &&
           Provider.of<List<JoinedOrg>>(context, listen: false) != null &&
@@ -84,7 +81,9 @@ class _HomeState extends State<Home> {
             ),
             actions: [
               Provider.of<CurrentOrg>(context).org != null
-                  ? Provider.of<CurrentOrg>(context).getUserRole() == "admin" || Provider.of<CurrentOrg>(context).getUserRole() == "owner"
+                  ? Provider.of<CurrentOrg>(context).getUserRole() == "admin" ||
+                          Provider.of<CurrentOrg>(context).getUserRole() ==
+                              "owner"
                       ? Container(
                           margin: EdgeInsets.all(12.0),
                           child: ElevatedButton(
@@ -100,22 +99,28 @@ class _HomeState extends State<Home> {
                 margin: EdgeInsets.fromLTRB(9.0, 0.0, 10.0, 0.0),
                 child: Center(
                   child: GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       _scaffoldKey.currentState.openEndDrawer();
                     },
                     child: Provider.of<CurrentOrg>(context).org == null
-                      ? Icon(Icons.add_box_outlined, size: 40.0, color: Theme.of(context).primaryColor,) 
-                      : Container(
-                      height: 40.0,
-                      width: 40.0,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5.0),
-                        image: DecorationImage(
-                          image: NetworkImage(Provider.of<CurrentOrg>(context).getOrgURL()),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
+                        ? Icon(
+                            Icons.add_box_outlined,
+                            size: 40.0,
+                            color: Theme.of(context).primaryColor,
+                          )
+                        : Container(
+                            height: 40.0,
+                            width: 40.0,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5.0),
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                    Provider.of<CurrentOrg>(context)
+                                        .getOrgURL()),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                   ),
                   // child: PopupMenuButton(
                   //   onSelected: (value) {
@@ -171,14 +176,15 @@ class _HomeState extends State<Home> {
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             JoinedOrg current = currentOrg.org;
-            print(current.orgName);
+            print(current.orgName.toString());
 
-            HttpsCallable _getOrgMembers = FirebaseFunctions.instance.httpsCallable('getOrgMembers');
+            HttpsCallable _getOrgMembers =
+                FirebaseFunctions.instance.httpsCallable('getOrgMembers');
 
             final members = await _getOrgMembers.call(<String, dynamic>{
-              'orgID': Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
+              'orgID':
+                  Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
             });
-            
 
             print(members.data[0]);
             print('Done');
@@ -233,10 +239,15 @@ class _DrawerItemsState extends State<DrawerItems> {
                   Expanded(
                     child: Container(),
                   ),
-                  Text(
-                    'Settings',
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
+                  TextButton(
+                    onPressed: (){
+                      Navigator.of(context).pushNamed('/user-settings');
+                    },
+                    child: Text(
+                      'Settings',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
                   ),
                 ],
