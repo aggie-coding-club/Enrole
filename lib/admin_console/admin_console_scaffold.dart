@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'admin_console_pages/analytics_page/analytics_page.dart';
 import 'admin_console_pages/manage_members_page/manage_members_page.dart';
 import 'admin_console_pages/org_settings_page/org_settings_page.dart';
+import 'admin_console_pages/org_notifications/org_notifications_page.dart';
 
 
 
@@ -39,6 +40,7 @@ class _AdminConsoleState extends State<AdminConsole> {
             backgroundColor: Theme.of(context).primaryColor,
             unselectedItemColor: Colors.white,
             selectedItemColor: Colors.white,
+            type: BottomNavigationBarType.fixed,
             onTap: (index){
               setState(() {
                 _bottomDrawerIndex = index;
@@ -51,6 +53,9 @@ class _AdminConsoleState extends State<AdminConsole> {
                   Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = AnalyticsPage();
                 break;
                 case 2:
+                  Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = OrgNotificationsPage();
+                break;
+                case 3:
                   Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = OrgSettingsPage();
                 break;
               }
@@ -63,6 +68,10 @@ class _AdminConsoleState extends State<AdminConsole> {
               BottomNavigationBarItem(
                 label: "Analytics",
                 icon: Icon(Icons.bar_chart_rounded),
+              ),
+              BottomNavigationBarItem(
+                label: "Notifications",
+                icon: Icon(Icons.notifications),
               ),
               BottomNavigationBarItem(
                 label: "Settings",

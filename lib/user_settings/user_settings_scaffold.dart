@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:provider/provider.dart';
 
 class UserSettingsScaffold extends StatefulWidget {
   @override
@@ -14,7 +15,9 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold> {
 
   FirebaseStorage _storage = FirebaseStorage.instance;
 
-  Widget getProfileImage() {
+
+
+  Widget getProfileImage(BuildContext context) {
     Widget profileImage;
 
     String userPhotoURL;
@@ -47,6 +50,9 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold> {
 
   @override
   Widget build(BuildContext context) {
+
+      User currentUser = Provider.of<User>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile Settings'),
@@ -66,7 +72,7 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold> {
         child: ListView(
           physics: BouncingScrollPhysics(),
           children: [
-            getProfileImage(),
+            getProfileImage(context),
             ElevatedButton(
               child: Text('Edit profile picture'),
               onPressed: (){},

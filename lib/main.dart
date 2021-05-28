@@ -39,7 +39,7 @@ class InitApp extends StatelessWidget {
           return MultiProvider(
             child: MyApp(),
             providers: [
-              StreamProvider<User>(create: (_) => FirebaseAuth.instance.authStateChanges(), initialData: null),
+              StreamProvider<User>(create: (_) => FirebaseAuth.instance.userChanges(), initialData: null),
               StreamProvider<UserData>(create: (_) => UserDatabaseService().streamUser(_auth.currentUser.uid), initialData: null,),
               StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],),
               ChangeNotifierProvider<CurrentPage>(create: (_) => CurrentPage(),),
@@ -67,6 +67,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        canvasColor: Colors.white,
         primarySwatch: Colors.blue,
         primaryColor: Colors.blue[700],
         visualDensity: VisualDensity.adaptivePlatformDensity,

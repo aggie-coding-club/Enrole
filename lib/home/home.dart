@@ -1,3 +1,4 @@
+import 'package:enrole_app_dev/admin_console/admin_console_pages/analytics_page/analytics_page.dart';
 import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'package:flutter/material.dart';
 import 'home_pages/overview.dart';
@@ -88,6 +89,7 @@ class _HomeState extends State<Home> {
                           margin: EdgeInsets.all(12.0),
                           child: ElevatedButton(
                             onPressed: () {
+                              Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = AnalyticsPage();
                               Navigator.pushNamed(context, '/admin-console');
                             },
                             child: Text('Admin'),
