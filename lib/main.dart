@@ -11,6 +11,8 @@ import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:enrole_app_dev/services/globals.dart';
 import 'admin_console/admin_console_scaffold.dart';
+import 'admin_console/admin_console_pages/analytics_page/analytics_page.dart';
+import 'user_settings/user_settings_scaffold.dart';
 
 void main() {
   runApp(InitApp());
@@ -37,11 +39,12 @@ class InitApp extends StatelessWidget {
           return MultiProvider(
             child: MyApp(),
             providers: [
-              StreamProvider<User>(create: (_) => FirebaseAuth.instance.authStateChanges(), initialData: null),
+              StreamProvider<User>(create: (_) => FirebaseAuth.instance.userChanges(), initialData: null),
               StreamProvider<UserData>(create: (_) => UserDatabaseService().streamUser(_auth.currentUser.uid), initialData: null,),
               StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],),
               ChangeNotifierProvider<CurrentPage>(create: (_) => CurrentPage(),),
-              ChangeNotifierProvider<CurrentOrg>(create: (_) => CurrentOrg(),)
+              ChangeNotifierProvider<CurrentOrg>(create: (_) => CurrentOrg(),),
+              ChangeNotifierProvider<CurrentAdminPage>(create: (_) => CurrentAdminPage(),),
             ],
           );
         } else {
@@ -64,6 +67,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        canvasColor: Colors.white,
         primarySwatch: Colors.blue,
         primaryColor: Colors.blue[700],
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -79,6 +83,7 @@ class MyApp extends StatelessWidget {
         '/register-user': (context) => RegisterUserPage(),
         '/home': (context) => Home(),
         '/admin-console': (context) => AdminConsole(),
+        '/user-settings': (context) => UserSettingsScaffold(),
       },
       navigatorObservers: [
         FirebaseAnalyticsObserver(analytics: Global.analytics),
@@ -120,11 +125,38 @@ class CurrentOrg with ChangeNotifier{
       return "Error";
     }
   }
+
+  String getOrgName(){
+    if (_org != null){
+      return _org.orgName;
+    } else {
+      return "Error";
+    }
+  }
 }
 
 class CurrentPage with ChangeNotifier {
   Widget _pageWidget = Overview();
   String _pageTitle = 'Overview';
+
+  get pageWidget => _pageWidget;
+
+  get pageTitle => _pageTitle;
+
+  set pageWidget(Widget widget){
+    _pageWidget = widget;
+    notifyListeners();
+  }
+
+  set pageTitle(String title){
+    _pageTitle = title;
+    notifyListeners();
+  }
+}
+
+class CurrentAdminPage with ChangeNotifier {
+  Widget _pageWidget = AnalyticsPage();
+  String _pageTitle = 'Analytics';
 
   get pageWidget => _pageWidget;
 

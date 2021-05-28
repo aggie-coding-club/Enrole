@@ -52,14 +52,8 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
     print("Signing up user");
     if (_formKey.currentState.validate()) {
       try {
-        final String finalSchool = await matchDomainToSchool(_email);
         await _auth.createUserWithEmailAndPassword(
             email: _email, password: _password2);
-        final user = _auth.currentUser;
-        await _firestore.collection('users').doc(user.uid).set({
-          'joined': DateTime.now(),
-          'school': finalSchool,
-        });
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => Home()),
