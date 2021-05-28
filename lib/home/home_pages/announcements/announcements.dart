@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+/*import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -100,5 +100,83 @@ class _AnnouncementsState extends State<Announcements> {
             return CircularProgressIndicator();
           }
         });
+  }
+}
+*/
+
+import 'package:flutter/material.dart';
+
+class Announcements extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        minimum: EdgeInsets.symmetric(horizontal: 20),
+        child: uploadPage(),
+      ),
+    );
+  }
+
+  Widget uploadPage() {
+    return ListView(
+      children: [
+        _appBar(),
+        _text(),
+        Spacer(),
+        _postButton(),
+        SizedBox(height: 30),
+      ],
+    );
+  }
+
+  Widget _appBar() {
+    return AppBar(
+      title: Text('New Announcement'),
+    );
+  }
+
+  Widget _text() {
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: TextFormField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(32.0)
+                ),
+                hintText: 'Title of Announcement...',
+                labelText: 'Subject',
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: TextFormField(
+              maxLines: 15,
+              minLines: 10,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(32.0)
+                ),
+                hintText: 'Body of Announcement...',
+                labelText: 'Description',
+              ),
+            ),
+          ),
+        ]
+      );
+  }
+
+  Widget _postButton() {
+    return SizedBox(
+      width: 100,
+      child: ElevatedButton(
+        child: Text('Post'),
+        onPressed: () {},
+      ),
+    );
   }
 }
