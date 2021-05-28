@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserDatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  JoinedOrg _currentOrg;
 
   Stream<UserData> streamUser(String userID) {
     return _firestore
@@ -18,9 +19,32 @@ class UserDatabaseService {
     var ref =
         _firestore.collection('users').doc(userID).collection('joinedOrgs');
 
-    return ref.snapshots().map((QuerySnapshot orgs) => orgs.docs
-        .map((DocumentSnapshot document) => JoinedOrg.fromFirestore(document))
-        .toList());
+    Stream<List<JoinedOrg>> stream = ref.snapshots().map((QuerySnapshot orgs) =>
+        orgs.docs
+            .map((DocumentSnapshot document) =>
+                JoinedOrg.fromFirestore(document))
+            .toList());
+
+    return stream;
+  }
+}
+
+class Organizations with ChangeNotifier {
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<JoinedOrg> _orgs;
+  JoinedOrg _current;
+
+  Stream<List<JoinedOrg>> streamJoinedOrgs(String userID) {
+    var ref =
+        _firestore.collection('users').doc(userID).collection('joinedOrgs');
+
+    Stream<List<JoinedOrg>> stream = ref.snapshots().map((QuerySnapshot orgs) =>
+        orgs.docs
+            .map((DocumentSnapshot document) =>
+                JoinedOrg.fromFirestore(document))
+            .toList());
+
+    return stream;
   }
 }
 

@@ -7,6 +7,7 @@ import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class VerifyPage extends StatefulWidget {
   final Function homeCallback;
@@ -46,90 +47,73 @@ class _VerifyPageState extends State<VerifyPage> {
   bool publishing = false;
 
   Future<Widget> isEmailVerified(BuildContext context) async {
-    try {
-      final user = context.watch<User>();
-      if (user.emailVerified) {
-        setState(() {
-          isEmailVerifiedVar = true;
-        });
-        return Container(
-          padding: EdgeInsets.all(12.0),
-          child: Row(
-            children: [
-              Icon(
-                Icons.check,
-                color: Colors.green,
-              ),
-              SizedBox(
-                width: 4.0,
-              ),
-              Text('Your email is verified'),
-            ],
-          ),
-        );
-      } else {
-        setState(() {
-          isEmailVerifiedVar = false;
-        });
-        return Container(
-          padding: EdgeInsets.all(12.0),
-          child: Row(
-            children: [
-              Icon(
-                Icons.clear,
-                color: Colors.red,
-              ),
-              SizedBox(
-                width: 4.0,
-              ),
-              Container(
-                child: Text('Your email is not verified'),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.refresh,
-                  color: Theme.of(context).primaryColor,
-                ),
-                onPressed: () {
-                  print('test ${this.widget.school}');
-                  setState(() {
-                    emailVerifiedWidget = isEmailVerified(context);
-                  });
-                },
-              ),
-              ElevatedButton(
-                child: Text('Verify'),
-                onPressed: () {
-                  user.sendEmailVerification();
-                },
-              ),
-            ],
-          ),
-        );
-      }
-    } catch (e) {
-      print(e);
+    try{
+      final user = _auth.currentUser;
+    if(user.emailVerified){
+      setState(() {
+        isEmailVerifiedVar = true;
+      });
+      return Container(
+        padding: EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            Icon(Icons.check, color: Colors.green,),
+            SizedBox(width: 4.0,),
+            Text('Your email is verified'),
+          ],
+        ),
+      );
+    } else{
+      setState(() {
+        isEmailVerifiedVar = false;
+      });
+      return Container(
+        padding: EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            Icon(Icons.clear, color: Colors.red,),
+            SizedBox(width: 4.0,),
+            Container(
+              child: Text('Your email is not verified'),
+            ),
+            IconButton(
+              icon: Icon(Icons.refresh, color: Theme.of(context).primaryColor,),
+              onPressed: (){
+                print('test ${this.widget.school}');
+                setState(() {
+                  emailVerifiedWidget = isEmailVerified(context);
+                });
+              },
+            ),
+            ElevatedButton(
+              child: Text('Verify'),
+              onPressed: (){
+                user.sendEmailVerification();
+              },
+            ),
+          ],
+        ),
+      );
     }
   }
 
-  void publishOrgToFirestore(
-      {String orgName,
-      String orgType,
-      String school,
-      File image,
-      String bio,
-      List<String> tags}) async {
-    try {
-      final user = _auth.currentUser;
+  void publishOrgToFirestore({String orgName, String orgType, String school, File image, String bio, List<String> tags}) async {
+    try{
+      print('Creating org...');
+      HttpsCallable createOrg = FirebaseFunctions.instance.httpsCallable('createOrg');
+      print('Got callable...');
+      //TODO: Make sure created organization can't override an existing one
       String orgID = uuid.v4().substring(0, 8);
-      if (user != null) {
+      final user = _auth.currentUser;
+      if(user != null){
         await _storage.ref().child('orgs/$orgID/profileImage').putFile(image);
         final profileImage = await _storage
             .ref()
             .child('orgs/$orgID/profileImage')
             .getDownloadURL();
         final profileImageURL = profileImage.toString();
-        await _firestore.collection('orgs').doc(orgID).set({
+        print('Got here...');
+        await createOrg.call(<String, dynamic>{
           'orgName': orgName,
           'orgType': orgType,
           'school': school,
@@ -138,17 +122,30 @@ class _VerifyPageState extends State<VerifyPage> {
           'tags': tags,
           'owner': user.uid,
           'orgID': orgID,
+          'time': DateTime.now().toString(),
         });
-        await _firestore
-            .collection('orgs')
-            .doc(orgID)
-            .collection('members')
-            .doc(user.uid)
-            .set({
-          'id': user.uid,
-          'role': 'admin',
-          'joined': DateTime.now(),
-        });
+        print('Invoked callable');
+        // await _firestore.collection('orgs').doc(orgID).set({
+        //   'orgName': orgName,
+        //   'orgType': orgType,
+        //   'school': school,
+        //   'profileImageURL': profileImageURL,
+        //   'bio': bio,
+        //   'tags': tags,
+        //   'owner': user.uid,
+        //   'orgID': orgID,
+        // });
+        // await _firestore.collection('orgs').doc(orgID).collection('members').doc(user.uid).set({
+        //   'userID': user.uid,
+        //   'role': 'admin',
+        //   'joined': DateTime.now(),
+        // });
+        // await _firestore.collection('users').doc(user.uid).collection('joinedOrgs').doc(orgID).set({
+        //   'orgName': orgName,
+        //   'orgImageURL': profileImageURL,
+        //   'orgID': orgID,
+        //   'userRole': 'admin',
+        // });
         var currentPage = Provider.of<CurrentPage>(context, listen: false);
         currentPage.pageWidget = Overview();
         currentPage.pageTitle = 'Overview';
@@ -336,4 +333,5 @@ class _VerifyPageState extends State<VerifyPage> {
       ],
     );
   }
+}
 }
