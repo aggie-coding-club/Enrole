@@ -47,65 +47,88 @@ class _VerifyPageState extends State<VerifyPage> {
   bool publishing = false;
 
   Future<Widget> isEmailVerified(BuildContext context) async {
-    try{
+    try {
       final user = _auth.currentUser;
-    if(user.emailVerified){
-      setState(() {
-        isEmailVerifiedVar = true;
-      });
-      return Container(
-        padding: EdgeInsets.all(12.0),
-        child: Row(
-          children: [
-            Icon(Icons.check, color: Colors.green,),
-            SizedBox(width: 4.0,),
-            Text('Your email is verified'),
-          ],
-        ),
-      );
-    } else{
-      setState(() {
-        isEmailVerifiedVar = false;
-      });
-      return Container(
-        padding: EdgeInsets.all(12.0),
-        child: Row(
-          children: [
-            Icon(Icons.clear, color: Colors.red,),
-            SizedBox(width: 4.0,),
-            Container(
-              child: Text('Your email is not verified'),
-            ),
-            IconButton(
-              icon: Icon(Icons.refresh, color: Theme.of(context).primaryColor,),
-              onPressed: (){
-                print('test ${this.widget.school}');
-                setState(() {
-                  emailVerifiedWidget = isEmailVerified(context);
-                });
-              },
-            ),
-            ElevatedButton(
-              child: Text('Verify'),
-              onPressed: (){
-                user.sendEmailVerification();
-              },
-            ),
-          ],
-        ),
-      );
+      if (user.emailVerified) {
+        setState(() {
+          isEmailVerifiedVar = true;
+        });
+        return Container(
+          padding: EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              Icon(
+                Icons.check,
+                color: Colors.green,
+              ),
+              SizedBox(
+                width: 4.0,
+              ),
+              Text('Your email is verified'),
+            ],
+          ),
+        );
+      } else {
+        setState(() {
+          isEmailVerifiedVar = false;
+        });
+        return Container(
+          padding: EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              Icon(
+                Icons.clear,
+                color: Colors.red,
+              ),
+              SizedBox(
+                width: 4.0,
+              ),
+              Container(
+                child: Text('Your email is not verified'),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.refresh,
+                  color: Theme.of(context).primaryColor,
+                ),
+                onPressed: () {
+                  print('test ${this.widget.school}');
+                  setState(() {
+                    emailVerifiedWidget = isEmailVerified(context);
+                  });
+                },
+              ),
+              ElevatedButton(
+                child: Text('Verify'),
+                onPressed: () {
+                  user.sendEmailVerification();
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (error) {
+      print(error);
     }
   }
 
-  void publishOrgToFirestore({String orgName, String orgType, String school, File image, String bio, List<String> tags}) async {
-    try{
+  void publishOrgToFirestore(
+      {String orgName,
+      String orgType,
+      String school,
+      File image,
+      String bio,
+      List<String> tags}) async {
+    try {
       print('Creating org...');
-      HttpsCallable createOrg = FirebaseFunctions.instance.httpsCallable('createOrg');
+      HttpsCallable createOrg =
+          FirebaseFunctions.instance.httpsCallable('createOrg');
       print('Got callable...');
       //TODO: Make sure created organization can't override an existing one
       String orgID = uuid.v4().substring(0, 8);
       final user = _auth.currentUser;
-      if(user != null){
+      if (user != null) {
         await _storage.ref().child('orgs/$orgID/profileImage').putFile(image);
         final profileImage = await _storage
             .ref()
@@ -333,5 +356,4 @@ class _VerifyPageState extends State<VerifyPage> {
       ],
     );
   }
-}
 }
