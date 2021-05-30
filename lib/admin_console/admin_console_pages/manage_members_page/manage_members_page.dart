@@ -3,13 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:enrole_app_dev/main.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
+import 'package:after_init/after_init.dart';
 
 class ManageMembersPage extends StatefulWidget {
   @override
   _ManageMembersPageState createState() => _ManageMembersPageState();
 }
 
-class _ManageMembersPageState extends State<ManageMembersPage> {
+class _ManageMembersPageState extends State<ManageMembersPage> with AfterInitMixin{
 
   
   Future<List<Widget>> memberData;
@@ -18,6 +19,12 @@ class _ManageMembersPageState extends State<ManageMembersPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    
+  }
+
+  @override
+  void didInitState() {
+    // TODO: implement didInitState
     memberData = getMemberTiles(context);
   }
 
@@ -70,16 +77,16 @@ Future<List<Widget>> getMemberTiles(BuildContext context) async {
   print(members);
 
   members.sort((m1, m2) {
-    if (m1['role'] == 'owner') return -1;
-    if (m2['role'] == 'owner') return 1;
-    var comparison = m1['role'].compareTo(m2['role']);
+    if (m1['userRole'] == 'owner') return -1;
+    if (m2['userRole'] == 'owner') return 1;
+    var comparison = m1['userRole'].compareTo(m2['userRole']);
     if (comparison != 0) {
-      if (m1['role'] == 'admin')
+      if (m1['userRole'] == 'admin')
         return -1;
       else
         return 1;
     }
-    return m1["displayName"].compareTo(m2["displayName"]);
+    return m1["userDisplayName"].compareTo(m2["userDisplayName"]);
   });
 
   print('Sorted members');

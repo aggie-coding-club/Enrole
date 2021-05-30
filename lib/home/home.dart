@@ -188,7 +188,7 @@ class _HomeState extends State<Home> {
                   Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
             });
 
-            print(members.data[0]);
+            print(members.data);
             print('Done');
           },
           child: Icon(Icons.add),

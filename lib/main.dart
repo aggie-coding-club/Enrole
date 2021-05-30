@@ -137,7 +137,7 @@ class CurrentOrg with ChangeNotifier{
 
 class CurrentPage with ChangeNotifier {
   Widget _pageWidget = Overview();
-  String _pageTitle = 'Overview';
+  String _pageTitle = 'Join an Org';
 
   get pageWidget => _pageWidget;
 

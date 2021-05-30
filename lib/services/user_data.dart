@@ -11,13 +11,15 @@ class UserDatabaseService {
     return _firestore
         .collection('users')
         .doc(userID)
+        .collection('hidden-data')
+        .doc('fixed')
         .snapshots()
         .map((event) => UserData.fromFirestore(event));
   }
 
   Stream<List<JoinedOrg>> streamJoinedOrgs(String userID) {
     var ref =
-        _firestore.collection('users').doc(userID).collection('joinedOrgs');
+        _firestore.collection('users').doc(userID).collection('joined-orgs');
 
     Stream<List<JoinedOrg>> stream = ref.snapshots().map((QuerySnapshot orgs) =>
         orgs.docs
@@ -36,7 +38,7 @@ class Organizations with ChangeNotifier {
 
   Stream<List<JoinedOrg>> streamJoinedOrgs(String userID) {
     var ref =
-        _firestore.collection('users').doc(userID).collection('joinedOrgs');
+        _firestore.collection('users').doc(userID).collection('joined-orgs');
 
     Stream<List<JoinedOrg>> stream = ref.snapshots().map((QuerySnapshot orgs) =>
         orgs.docs
@@ -79,10 +81,6 @@ class UserData {
   factory UserData.fromFirestore(DocumentSnapshot document) {
     Map data = document.data() ?? {};
     return UserData(
-      username: data['username'] ?? "Unnamed User",
-      profileImageURL: data['profileImageURL'] ??
-          "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
-      joinedDate: data['joinedDate'] ?? DateTime.now().toString(),
       school: data['school'],
     );
   }
