@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
+import 'package:enrole_app_dev/admin_console/admin_console_pages/manage_members_page/manage_join_requests.dart';
 
 class OrgNotificationBuilder extends StatefulWidget {
   final Map<String, dynamic> notificationData;
@@ -21,7 +22,7 @@ class _OrgNotificationBuilderState extends State<OrgNotificationBuilder> {
         return userJoinNotification(notificationData);
         break;
       case 'userJoinRequest':
-        return userJoinRequestNotification(notificationData);
+        return userJoinRequestNotification(notificationData, context);
         break;
       default:
         return errorNotification();
@@ -67,7 +68,7 @@ Widget userJoinNotification(Map<String, dynamic> notificationData) {
     }
   }
 
-  Widget userJoinRequestNotification(Map<String, dynamic> notificationData){
+  Widget userJoinRequestNotification(Map<String, dynamic> notificationData, BuildContext context){
      /* Document fields:
       type: 'userJoinRequest'
       userName: The name of the user joining
@@ -92,8 +93,10 @@ Widget userJoinNotification(Map<String, dynamic> notificationData) {
         subtitle: Text(notificationData['timestamp'].toDate().toString()),
         leading: Icon(Icons.group_add),
         trailing: IconButton(
-          icon: Icon(Icons.more_vert),
-          onPressed: (){},
+          icon: Icon(Icons.open_in_new),
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>ManageJoinRequestsPage()));
+          },
         ),
       );
     }catch(error){

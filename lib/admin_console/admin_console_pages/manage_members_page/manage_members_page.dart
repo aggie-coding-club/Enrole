@@ -57,7 +57,7 @@ class _ManageMembersPageState extends State<ManageMembersPage>
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: () {}, child: Text('Loading...'))
+                    TextButton(onPressed: null, child: Text('Loading...'))
                   ],
                 );
               }

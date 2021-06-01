@@ -37,6 +37,12 @@ class _ManageJoinRequestsPageState extends State<ManageJoinRequestsPage>
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -59,7 +65,7 @@ class _ManageJoinRequestsPageState extends State<ManageJoinRequestsPage>
               if (querySnapshot.size != 0) {
                 return requestTiles(querySnapshot, context);
               } else {
-                return Text('No requests :(');
+                return Center(child: Text('No active join requests'));
               }
             } else {
               return CircularProgressIndicator();
