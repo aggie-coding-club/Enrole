@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
 import 'package:after_init/after_init.dart';
+import 'org_notification_builder.dart';
 
 
 class OrgNotificationsPage extends StatefulWidget {
@@ -23,7 +24,7 @@ class _OrgNotificationsPageState extends State<OrgNotificationsPage> with AfterI
     QuerySnapshot query;
     
     try{
-      query = await _firestore.collection('orgs').doc(Provider.of<CurrentOrg>(context).getOrgID()).collection('notifications').orderBy("timestamp").limit(10).get();
+      query = await _firestore.collection('orgs').doc(Provider.of<CurrentOrg>(context).getOrgID()).collection('notifications').orderBy("timestamp", descending: true).limit(10).get();
     }catch(error){print('Getting notificaitons failed. Error: $error');}
 
     print('Got notifications');
@@ -52,6 +53,9 @@ class _OrgNotificationsPageState extends State<OrgNotificationsPage> with AfterI
         if(snapshot.connectionState == ConnectionState.done){
           if(snapshot.hasData){
             QuerySnapshot query = snapshot.data;
+            if(query.docs.length == 0){
+              return Text('No notifications');
+            }
             return ListView(
               children: notificationBuilder(query),
             );
@@ -67,28 +71,12 @@ class _OrgNotificationsPageState extends State<OrgNotificationsPage> with AfterI
 }
 
 List<Widget> notificationBuilder(QuerySnapshot querySnapshot){
+
   List<Widget> _notificationTiles = [];
   
   try{
     _notificationTiles = List.generate(querySnapshot.docs.length, (index){
-      return ListTile(
-        title: RichText(
-          text: TextSpan(
-            text: querySnapshot.docs[index]['title'],
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-            children: <TextSpan>[
-              TextSpan(
-                text: " ${querySnapshot.docs[index]['subtitle']}",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            ]
-          ),
-        ),
-        subtitle: Text(querySnapshot.docs[index]['timestamp'].toDate().toString()),
-      );
+      return OrgNotificationBuilder(notificationData: querySnapshot.docs[index].data());
     });
   }catch(error){print(error);}
 

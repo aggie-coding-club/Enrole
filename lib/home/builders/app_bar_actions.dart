@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
 import 'package:enrole_app_dev/home/home_pages/search_orgs/search_orgs.dart';
 import 'package:enrole_app_dev/home/home_pages/register_organization/register_organization.dart';
+import 'package:enrole_app_dev/home/home_pages/search_orgs/search_by_id/search_by_id_page.dart';
 
 List<Widget> orgPanelTiles(BuildContext context) {
   List<JoinedOrg> orgList = context.read<List<JoinedOrg>>();
@@ -81,7 +82,11 @@ List<Widget> orgPanelTiles(BuildContext context) {
     child: ListTile(
       title: Text("Search by ID"),
       leading: Icon(Icons.fingerprint),
-      onTap: () {},
+      onTap: () {
+        var currentPage = Provider.of<CurrentPage>(context, listen: false);
+        currentPage.pageWidget = SearchByIDPage();
+        Navigator.pop(context);
+      },
     ),
   ));
 
