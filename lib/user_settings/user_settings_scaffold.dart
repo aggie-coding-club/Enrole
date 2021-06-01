@@ -2,33 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:after_init/after_init.dart';
 
 class UserSettingsScaffold extends StatefulWidget {
   @override
   _UserSettingsScaffoldState createState() => _UserSettingsScaffoldState();
 }
 
-class _UserSettingsScaffoldState extends State<UserSettingsScaffold> {
+class _UserSettingsScaffoldState extends State<UserSettingsScaffold> with AfterInitMixin {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   FirebaseAuth _auth = FirebaseAuth.instance;
-
   FirebaseStorage _storage = FirebaseStorage.instance;
+  String userPhotoURL;  
+  bool userProfileEdited = false;
+  User _user;
+  String _userDisplayName;
 
-
-
-  Widget getProfileImage(BuildContext context) {
-    Widget profileImage;
-
-    String userPhotoURL;
+  Widget getProfileImage(BuildContext context,  User user) {   
+  Widget profileImage; 
 
     try {
-      userPhotoURL = _auth.currentUser.photoURL;
-
-      if (userPhotoURL == null) {
-        userPhotoURL =
-            "https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg";
-      }
+      userPhotoURL = user.photoURL;
 
       profileImage = Container(
         height: 100.0,
@@ -49,9 +43,23 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    
+  }
 
-      User currentUser = Provider.of<User>(context);
+  @override
+  void didInitState() {
+    // TODO: implement didInitState
+    _user = Provider.of<User>(context);
+    _userDisplayName = Provider.of<User>(context).displayName;
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
@@ -72,30 +80,36 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold> {
         child: ListView(
           physics: BouncingScrollPhysics(),
           children: [
-            getProfileImage(context),
+            getProfileImage(context, _user),
             ElevatedButton(
               child: Text('Edit profile picture'),
               onPressed: (){},
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Email: ${_auth.currentUser.email.toString()}'),
-                ElevatedButton(
-                  child: Text('Change email'),
-                  onPressed: () {},
-                ),
-              ],
+            TextFormField(
+              initialValue: _user.displayName,
+              onChanged: (value){
+                if(value != _user.displayName){
+                  _userDisplayName = value;
+                  setState(() {
+                    userProfileEdited = true;
+                  });
+                }
+              },
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Display name: ${_auth.currentUser.displayName.toString()}'),
-                ElevatedButton(
-                  child: Text('Change display name'),
-                  onPressed: () {},
-                ),
-              ],
+            ElevatedButton(
+              onPressed: !userProfileEdited 
+              ? null
+              : (){
+                if(_formKey.currentState.validate()){
+                  _user.updateProfile(
+                    displayName: _userDisplayName,
+                  );
+                  setState(() {
+                    userProfileEdited = false;
+                  });
+                }
+              },
+              child: Text('Update profile'),
             ),
           ],
         ),

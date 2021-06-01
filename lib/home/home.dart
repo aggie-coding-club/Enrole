@@ -53,6 +53,7 @@ class _HomeState extends State<Home> {
     });
     context.watch<List<JoinedOrg>>();
     context.watch<CurrentOrg>();
+    context.watch<User>();
 
     return Consumer2<CurrentPage, CurrentOrg>(
       builder: (_, currentPage, currentOrg, __) => Scaffold(
@@ -208,6 +209,7 @@ class _DrawerItemsState extends State<DrawerItems> {
                 children: [
                   CircleAvatar(
                     radius: 40.0,
+                    backgroundImage: NetworkImage(Provider.of<User>(context).photoURL),
                   ),
                   Expanded(
                     child: Container(),
@@ -231,7 +233,7 @@ class _DrawerItemsState extends State<DrawerItems> {
                   children: [
                     Container(
                         margin: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(_auth.currentUser.email)),
+                        child: Text(Provider.of<User>(context).displayName)),
                   ],
                 ),
               ),
