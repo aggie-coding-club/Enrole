@@ -70,75 +70,112 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
       body: SafeArea(
         child: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                onChanged: (value) {
-                  setState(() {
-                    _email = value;
-                    Iterable<RegExpMatch> domain = exp.allMatches(_email);
-                    if (domain.length == 1) {
-                      print('Search Initiated');
-                      matchingSchoolName = matchDomainToSchool(_email);
-                      matchedSchool = matchedSchoolText(matchingSchoolName);
-                    } else if (domain.length == 0) {
-                      matchedSchool = null;
-                      matchingSchoolName = null;
-                    }
-                  });
-                },
-                validator: (value) {
-                  print("Signup With Email: $matchingSchoolName");
-                  Iterable<RegExpMatch> domain = exp.allMatches(value);
-                  if (value.isEmpty) {
-                    return 'Please input text';
-                  }
-                  if (domain.length == 0) {
-                    return 'Please enter a valid school email (email@college.edu)';
-                  }
-                  if (matchingSchoolName == null) {
-                    return 'No universities match that domain';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                onChanged: (value) {
-                  setState(() {
-                    _password1 = value;
-                  });
-                },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please input text';
-                  }
-                  if (value.length <= 6) {
-                    return 'Please input a password longer than 6 characters';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                onChanged: (value) {
-                  setState(() {
-                    _password2 = value;
-                  });
-                },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please input text';
-                  }
-                  if (value.length <= 6) {
-                    return 'Please input a password longer than 6 characters';
-                  }
-                  return null;
-                },
-              ),
-              matchedSchool != null
-                  ? matchedSchool
-                  : Text('No Universities match that domain'),
-              ElevatedButton(onPressed: signupUser, child: Text('Register here')),
-            ],
+          child: Container(
+            padding: EdgeInsets.all(12.0),
+            child: ListView(
+              children: [
+                SizedBox(
+                  height: 50.0,
+                ),
+                Text(
+                  'Register',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 40.0,
+                  ),
+                ),
+                SizedBox(height: 70.0),
+                Container(
+                  margin: EdgeInsets.all(12.0),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      icon: Icon(Icons.email),
+                      hintText: 'Enter your email',
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _email = value;
+                        Iterable<RegExpMatch> domain = exp.allMatches(_email);
+                        if (domain.length == 1) {
+                          print('Search Initiated');
+                          matchingSchoolName = matchDomainToSchool(_email);
+                          matchedSchool = matchedSchoolText(matchingSchoolName);
+                        } else if (domain.length == 0) {
+                          matchedSchool = null;
+                          matchingSchoolName = null;
+                        }
+                      });
+                    },
+                    validator: (value) {
+                      print("Signup With Email: $matchingSchoolName");
+                      Iterable<RegExpMatch> domain = exp.allMatches(value);
+                      if (value.isEmpty) {
+                        return 'Please input text';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(12.0),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      icon: Icon(Icons.password),
+                      hintText: 'Enter a password',
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _password1 = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please input text';
+                      }
+                      if (value.length <= 6) {
+                        return 'Please input a password longer than 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(12.0),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      icon: Icon(Icons.refresh),
+                      hintText: 'Reenter your password',
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _password2 = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please input text';
+                      }
+                      if (value.length <= 6) {
+                        return 'Please input a password longer than 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Text('School match:'),
+                matchedSchool != null
+                    ? matchedSchool
+                    : Text('No Universities match that domain'),
+                SizedBox(
+                  height: 12.0,
+                ),
+                ElevatedButton(
+                    onPressed: signupUser, child: Text('Register here')),
+              ],
+            ),
           ),
         ),
       ),

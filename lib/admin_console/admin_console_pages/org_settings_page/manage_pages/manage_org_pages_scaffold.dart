@@ -13,9 +13,6 @@ class _ManageOrgPagesState extends State<ManageOrgPages> {
 
   Future<List<String>> activePagesData;
 
-  
-  
-
   Future<List<String>> getActivePages() async {
     try {
       QuerySnapshot query = await _firestore
@@ -51,7 +48,7 @@ class _ManageOrgPagesState extends State<ManageOrgPages> {
         leading: IconButton(
           color: Colors.white,
           icon: Icon(Icons.clear),
-          onPressed: (){
+          onPressed: () {
             Navigator.of(context).pop();
           },
         ),
@@ -71,7 +68,6 @@ class _ManageOrgPagesState extends State<ManageOrgPages> {
 }
 
 class PageTile extends StatefulWidget {
-
   final String page;
 
   final Widget leading;
@@ -83,7 +79,6 @@ class PageTile extends StatefulWidget {
 }
 
 class _PageTileState extends State<PageTile> {
-
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void activatePage(String page, BuildContext context) async {
@@ -137,52 +132,53 @@ class _PageTileState extends State<PageTile> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: _firestore.collection('orgs').doc(Provider.of<CurrentOrg>(context).getOrgID()).collection('pages').doc(this.widget.page).snapshots(),
-      builder: (_, stream){
+        stream: _firestore
+            .collection('orgs')
+            .doc(Provider.of<CurrentOrg>(context).getOrgID())
+            .collection('pages')
+            .doc(this.widget.page)
+            .snapshots(),
+        builder: (_, stream) {
+          print(stream.connectionState.toString());
 
-        print(stream.connectionState.toString());
+          if (stream.connectionState == ConnectionState.active) {
+            print('Snapshot done');
 
-        if(stream.connectionState == ConnectionState.active){
+            DocumentSnapshot doc = stream.data;
 
-          print('Snapshot done');
+            bool active = false;
 
-          DocumentSnapshot doc = stream.data;
+            if (doc.exists) {
+              active = true;
+            }
 
-          bool active = false;
-
-          if(doc.exists){
-            active = true;
+            return Card(
+              child: ListTile(
+                  title: Text(this.widget.page),
+                  leading: this.widget.leading,
+                  trailing: active
+                      ? ElevatedButton(
+                          child: Text('Deactivate'),
+                          onPressed: () {
+                            deactivatePage(this.widget.page, context);
+                          },
+                        )
+                      : ElevatedButton(
+                          child: Text('Activate'),
+                          onPressed: () {
+                            activatePage(this.widget.page, context);
+                          },
+                        )),
+            );
+          } else {
+            return Card(
+              child: ListTile(
+                title: Text(this.widget.page),
+                leading: this.widget.leading,
+                trailing: CircularProgressIndicator(),
+              ),
+            );
           }
-
-          return Card(
-            child: ListTile(
-              title: Text(this.widget.page),
-              leading: this.widget.leading,
-              trailing: active
-              ? ElevatedButton(
-                child: Text('Deactivate'),
-                onPressed: (){
-                  deactivatePage(this.widget.page, context);
-                },
-              )
-              : ElevatedButton(
-                child: Text('Activate'),
-                onPressed: (){
-                  activatePage(this.widget.page, context);
-                },
-              )
-            ),
-          );
-        } else {
-          return Card(
-            child: ListTile(
-              title: Text(this.widget.page),
-              leading: this.widget.leading,
-              trailing: CircularProgressIndicator(),
-            ),
-          );
-        }
-      }
-    );
+        });
   }
 }

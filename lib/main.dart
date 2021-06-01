@@ -13,8 +13,13 @@ import 'package:enrole_app_dev/services/globals.dart';
 import 'admin_console/admin_console_scaffold.dart';
 import 'admin_console/admin_console_pages/analytics_page/analytics_page.dart';
 import 'user_settings/user_settings_scaffold.dart';
+import 'package:flutter/services.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
   runApp(InitApp());
 }
 
@@ -92,6 +97,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class CurrentOrg with ChangeNotifier{
   JoinedOrg _org;
 
@@ -137,7 +143,7 @@ class CurrentOrg with ChangeNotifier{
 
 class CurrentPage with ChangeNotifier {
   Widget _pageWidget = Overview();
-  String _pageTitle = 'Overview';
+  String _pageTitle = 'Join an Org';
 
   get pageWidget => _pageWidget;
 
