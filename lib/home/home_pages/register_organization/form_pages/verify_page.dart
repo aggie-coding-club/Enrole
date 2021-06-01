@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:after_init/after_init.dart';
 
 class VerifyPage extends StatefulWidget {
 
@@ -25,7 +26,7 @@ class VerifyPage extends StatefulWidget {
   _VerifyPageState createState() => _VerifyPageState();
 }
 
-class _VerifyPageState extends State<VerifyPage> {
+class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
   
   FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -41,10 +42,12 @@ class _VerifyPageState extends State<VerifyPage> {
 
   bool publishing = false;
 
+  User _user;
+
   Future<Widget> isEmailVerified(BuildContext context) async {
+ 
     try{
-      User user = _auth.currentUser;
-    if(user.emailVerified){
+    if(_user.emailVerified){
       setState(() {
         isEmailVerifiedVar = true;
       });
@@ -76,6 +79,7 @@ class _VerifyPageState extends State<VerifyPage> {
               onPressed: (){
                 print('test ${this.widget.school}');
                 setState(() {
+                  _user.updateProfile();
                   emailVerifiedWidget = isEmailVerified(context);
                 });
               },
@@ -83,7 +87,7 @@ class _VerifyPageState extends State<VerifyPage> {
             ElevatedButton(
               child: Text('Verify'),
               onPressed: (){
-                user.sendEmailVerification();
+                _user.sendEmailVerification();
               },
             ),
           ],
@@ -118,27 +122,6 @@ class _VerifyPageState extends State<VerifyPage> {
           'time': DateTime.now().toString(),
         });
         print('Invoked callable');
-        // await _firestore.collection('orgs').doc(orgID).set({
-        //   'orgName': orgName,
-        //   'orgType': orgType,
-        //   'school': school,
-        //   'profileImageURL': profileImageURL,
-        //   'bio': bio,
-        //   'tags': tags,
-        //   'owner': user.uid,
-        //   'orgID': orgID,
-        // });
-        // await _firestore.collection('orgs').doc(orgID).collection('members').doc(user.uid).set({
-        //   'userID': user.uid,
-        //   'role': 'admin',
-        //   'joined': DateTime.now(),
-        // });
-        // await _firestore.collection('users').doc(user.uid).collection('joinedOrgs').doc(orgID).set({
-        //   'orgName': orgName,
-        //   'orgImageURL': profileImageURL,
-        //   'orgID': orgID,
-        //   'userRole': 'admin',
-        // });
         var currentPage = Provider.of<CurrentPage>(context, listen: false);
         currentPage.pageWidget = Overview();
         currentPage.pageTitle = 'Overview';
@@ -154,6 +137,12 @@ class _VerifyPageState extends State<VerifyPage> {
   }
 
   @override
+  void didInitState() {
+    // TODO: implement didInitState
+    _user = Provider.of<User>(context);
+  }
+
+  @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
@@ -163,6 +152,8 @@ class _VerifyPageState extends State<VerifyPage> {
   }
   @override
   Widget build(BuildContext context) {
+
+    _user = Provider.of<User>(context);
 
     bool isNameDone = this.widget.orgName != null && this.widget.orgName.length >= 3;
     bool isTypeDone = this.widget.orgType != null;

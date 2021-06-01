@@ -97,6 +97,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class CurrentOrg with ChangeNotifier{
   JoinedOrg _org;
 

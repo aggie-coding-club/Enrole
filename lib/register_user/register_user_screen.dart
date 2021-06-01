@@ -74,7 +74,9 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
             padding: EdgeInsets.all(12.0),
             child: ListView(
               children: [
-                SizedBox(height: 50.0,),
+                SizedBox(
+                  height: 50.0,
+                ),
                 Text(
                   'Register',
                   style: TextStyle(
@@ -167,8 +169,11 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                 matchedSchool != null
                     ? matchedSchool
                     : Text('No Universities match that domain'),
-                    SizedBox(height: 12.0,),
-                ElevatedButton(onPressed: signupUser, child: Text('Register here')),
+                SizedBox(
+                  height: 12.0,
+                ),
+                ElevatedButton(
+                    onPressed: signupUser, child: Text('Register here')),
               ],
             ),
           ),

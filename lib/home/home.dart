@@ -12,13 +12,14 @@ import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:after_init/after_init.dart';
 
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with AfterInitMixin {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -42,6 +43,12 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void didInitState() async {
+    // TODO: implement didInitState
+    
+  }
+
+  @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Provider.of<CurrentOrg>(context, listen: false).org == null &&
@@ -55,8 +62,8 @@ class _HomeState extends State<Home> {
     context.watch<CurrentOrg>();
     context.watch<User>();
 
-    return Consumer2<CurrentPage, CurrentOrg>(
-      builder: (_, currentPage, currentOrg, __) => Scaffold(
+    return Consumer3<CurrentPage, CurrentOrg, User>(
+      builder: (_, currentPage, currentOrg, currentUser, __) => Scaffold(
         key: _scaffoldKey,
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
@@ -149,19 +156,20 @@ class _HomeState extends State<Home> {
         body: currentPage.pageWidget,
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            JoinedOrg current = currentOrg.org;
-            print(current.orgName.toString());
+            // JoinedOrg current = currentOrg.org;
+            // print(current.orgName.toString());
 
-            HttpsCallable _getOrgMembers =
-                FirebaseFunctions.instance.httpsCallable('getOrgMembers');
+            // HttpsCallable _getOrgMembers =
+            //     FirebaseFunctions.instance.httpsCallable('getOrgMembers');
 
-            final members = await _getOrgMembers.call(<String, dynamic>{
-              'orgID':
-                  Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
-            });
+            // final members = await _getOrgMembers.call(<String, dynamic>{
+            //   'orgID':
+            //       Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
+            // });
 
-            print(members.data);
-            print('Done');
+            // print(members.data);
+            // print('Done');
+            print(currentUser.emailVerified.toString());
           },
           child: Icon(Icons.add),
         ),
