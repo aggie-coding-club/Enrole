@@ -124,35 +124,6 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                   ),
-                  // child: PopupMenuButton(
-                  //   onSelected: (value) {
-                  //     if (value == 998) {
-                  //       setState(() {
-                  //         var currentPage =
-                  //             Provider.of<CurrentPage>(context, listen: false);
-                  //         currentPage.pageWidget = SearchOrgs();
-                  //         currentPage.pageTitle = 'Search your School\'s Orgs';
-                  //       });
-                  //     }
-                  //     if (value == 999) {
-                  //       setState(() {
-                  //         var currentPage =
-                  //             Provider.of<CurrentPage>(context, listen: false);
-                  //         currentPage.pageWidget = RegisterOrganizationPage();
-                  //         currentPage.pageTitle = 'Register an Organization';
-                  //       });
-                  //     }
-                  //   },
-                  //   padding: EdgeInsets.all(0.0),
-                  //   elevation: 2.0,
-                  //   offset: Offset(50, 50),
-                  //   iconSize: 30.0,
-                  //   icon: Icon(Icons.add_circle_outline_sharp),
-                  //   itemBuilder: (context) {
-                  //     return orgListMenuItems(context);
-                  //   },
-                  //   initialValue: 1000,
-                  // ),
                 ),
               ),
             ],

@@ -4,13 +4,14 @@ import 'package:enrole_app_dev/home/home_pages/search_orgs/org_public_profile.da
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
+import 'package:after_init/after_init.dart';
 
 class SearchByIDPage extends StatefulWidget {
   @override
   _SearchByIDPageState createState() => _SearchByIDPageState();
 }
 
-class _SearchByIDPageState extends State<SearchByIDPage> {
+class _SearchByIDPageState extends State<SearchByIDPage>{
 
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -26,8 +27,7 @@ class _SearchByIDPageState extends State<SearchByIDPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var currentPage = Provider.of<CurrentPage>(context, listen: false);
-    currentPage.pageTitle = 'Search by ID';
+    
   }
 
   @override

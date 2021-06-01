@@ -6,6 +6,7 @@ import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:after_init/after_init.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'manage_join_requests.dart';
 
 class ManageMembersPage extends StatefulWidget {
   @override
@@ -51,7 +52,7 @@ class _ManageMembersPageState extends State<ManageMembersPage>
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 QuerySnapshot querySnapshot = snapshot.data;
-                return joinRequests(querySnapshot);
+                return joinRequests(querySnapshot, context);
               } else {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -155,11 +156,11 @@ Future<List<Widget>> getMemberTiles(BuildContext context) async {
   return memberTiles;
 }
 
-Widget joinRequests(QuerySnapshot querySnapshot) {
+Widget joinRequests(QuerySnapshot querySnapshot, BuildContext context) {
   if (querySnapshot.size == 0) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
-      children: [TextButton(onPressed: () {}, child: Text('No requests'))],
+      children: [TextButton(onPressed: null, child: Text('No requests'))],
     );
   } else {
     String text = '(${querySnapshot.size}) requests';
@@ -171,7 +172,12 @@ Widget joinRequests(QuerySnapshot querySnapshot) {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ManageJoinRequestsPage()));
+          },
           child: Text(text),
         )
       ],
