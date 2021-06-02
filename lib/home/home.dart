@@ -10,13 +10,18 @@ import 'builders/app_bar_actions.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
+<<<<<<< HEAD
+=======
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:after_init/after_init.dart';
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with AfterInitMixin {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -60,9 +65,32 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void didInitState() async {
+    // TODO: implement didInitState
+    
+  }
+
+  @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return Consumer<CurrentPage>(
       builder: (_, currentPage, __) => Scaffold(
+=======
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Provider.of<CurrentOrg>(context, listen: false).org == null &&
+          Provider.of<List<JoinedOrg>>(context, listen: false) != null &&
+          Provider.of<List<JoinedOrg>>(context, listen: false).isNotEmpty) {
+        Provider.of<CurrentOrg>(context, listen: false).org =
+            Provider.of<List<JoinedOrg>>(context, listen: false)[0];
+      }
+    });
+    context.watch<List<JoinedOrg>>();
+    context.watch<CurrentOrg>();
+    context.watch<User>();
+
+    return Consumer3<CurrentPage, CurrentOrg, User>(
+      builder: (_, currentPage, currentOrg, currentUser, __) => Scaffold(
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
         key: _scaffoldKey,
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
@@ -144,6 +172,45 @@ class _HomeState extends State<Home> {
           child: drawerItems(),
         ),
         body: currentPage.pageWidget,
+<<<<<<< HEAD
+=======
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            // JoinedOrg current = currentOrg.org;
+            // print(current.orgName.toString());
+
+            // HttpsCallable _getOrgMembers =
+            //     FirebaseFunctions.instance.httpsCallable('getOrgMembers');
+
+            // final members = await _getOrgMembers.call(<String, dynamic>{
+            //   'orgID':
+            //       Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
+            // });
+
+            // print(members.data);
+            // print('Done');
+            print(currentUser.emailVerified.toString());
+          },
+          child: Icon(Icons.add),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 0,
+          showUnselectedLabels: false,
+          backgroundColor: Theme.of(context).primaryColor,
+          unselectedItemColor: Colors.white,
+          selectedItemColor: Colors.white,
+          items: [
+            BottomNavigationBarItem(
+              label: "Home",
+              icon: Icon(Icons.home),
+            ),
+            BottomNavigationBarItem(
+              label: "Members",
+              icon: Icon(Icons.notifications),
+            ),
+          ],
+        ),
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
       ),
     );
   }
@@ -171,6 +238,7 @@ class _drawerItemsState extends State<drawerItems> {
                 children: [
                   CircleAvatar(
                     radius: 40.0,
+                    backgroundImage: NetworkImage(Provider.of<User>(context).photoURL),
                   ),
                   Container(
                     height: 30.0,
@@ -185,9 +253,21 @@ class _drawerItemsState extends State<drawerItems> {
                   Text(context.read<UserData>().school),
                 ],
               ),
+<<<<<<< HEAD
               IconButton(
                 onPressed: () {},
                 icon: Icon(Icons.settings),
+=======
+              Container(
+                height: 30.0,
+                child: Row(
+                  children: [
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(Provider.of<User>(context).displayName)),
+                  ],
+                ),
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
               ),
             ],
           ),

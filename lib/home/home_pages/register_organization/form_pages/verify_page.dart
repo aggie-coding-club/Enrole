@@ -7,6 +7,11 @@ import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
+<<<<<<< HEAD
+=======
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:after_init/after_init.dart';
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 class VerifyPage extends StatefulWidget {
   final Function homeCallback;
@@ -30,7 +35,12 @@ class VerifyPage extends StatefulWidget {
   _VerifyPageState createState() => _VerifyPageState();
 }
 
+<<<<<<< HEAD
 class _VerifyPageState extends State<VerifyPage> {
+=======
+class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
+  
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -45,7 +55,10 @@ class _VerifyPageState extends State<VerifyPage> {
 
   bool publishing = false;
 
+  User _user;
+
   Future<Widget> isEmailVerified(BuildContext context) async {
+<<<<<<< HEAD
     try {
       final user = context.watch<User>();
       if (user.emailVerified) {
@@ -109,6 +122,56 @@ class _VerifyPageState extends State<VerifyPage> {
       }
     } catch (e) {
       print(e);
+=======
+ 
+    try{
+    if(_user.emailVerified){
+      setState(() {
+        isEmailVerifiedVar = true;
+      });
+      return Container(
+        padding: EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            Icon(Icons.check, color: Colors.green,),
+            SizedBox(width: 4.0,),
+            Text('Your email is verified'),
+          ],
+        ),
+      );
+    } else{
+      setState(() {
+        isEmailVerifiedVar = false;
+      });
+      return Container(
+        padding: EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            Icon(Icons.clear, color: Colors.red,),
+            SizedBox(width: 4.0,),
+            Container(
+              child: Text('Your email is not verified'),
+            ),
+            IconButton(
+              icon: Icon(Icons.refresh, color: Theme.of(context).primaryColor,),
+              onPressed: (){
+                print('test ${this.widget.school}');
+                setState(() {
+                  _user.updateProfile();
+                  emailVerifiedWidget = isEmailVerified(context);
+                });
+              },
+            ),
+            ElevatedButton(
+              child: Text('Verify'),
+              onPressed: (){
+                _user.sendEmailVerification();
+              },
+            ),
+          ],
+        ),
+      );
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
     }
   }
 
@@ -139,6 +202,7 @@ class _VerifyPageState extends State<VerifyPage> {
           'owner': user.uid,
           'orgID': orgID,
         });
+<<<<<<< HEAD
         await _firestore
             .collection('orgs')
             .doc(orgID)
@@ -149,6 +213,9 @@ class _VerifyPageState extends State<VerifyPage> {
           'role': 'admin',
           'joined': DateTime.now(),
         });
+=======
+        print('Invoked callable');
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
         var currentPage = Provider.of<CurrentPage>(context, listen: false);
         currentPage.pageWidget = Overview();
         currentPage.pageTitle = 'Overview';
@@ -164,6 +231,12 @@ class _VerifyPageState extends State<VerifyPage> {
   }
 
   @override
+  void didInitState() {
+    // TODO: implement didInitState
+    _user = Provider.of<User>(context);
+  }
+
+  @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
@@ -174,8 +247,15 @@ class _VerifyPageState extends State<VerifyPage> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     bool isNameDone =
         this.widget.orgName != null && this.widget.orgName.length >= 3;
+=======
+
+    _user = Provider.of<User>(context);
+
+    bool isNameDone = this.widget.orgName != null && this.widget.orgName.length >= 3;
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
     bool isTypeDone = this.widget.orgType != null;
     bool isSchoolDone = this.widget.school != null;
 

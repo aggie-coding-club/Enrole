@@ -10,8 +10,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:enrole_app_dev/services/globals.dart';
+<<<<<<< HEAD
+=======
+import 'admin_console/admin_console_scaffold.dart';
+import 'admin_console/admin_console_pages/analytics_page/analytics_page.dart';
+import 'user_settings/user_settings_scaffold.dart';
+import 'package:flutter/services.dart';
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
   runApp(InitApp());
 }
 
@@ -94,9 +105,56 @@ class MyApp extends StatelessWidget {
   }
 }
 
+<<<<<<< HEAD
+=======
+
+class CurrentOrg with ChangeNotifier{
+  JoinedOrg _org;
+
+  get org => _org;
+
+  set org(JoinedOrg org){
+    _org = org;
+    notifyListeners();
+  }
+
+  String getOrgURL (){
+    if (_org != null){
+      return _org.orgImageURL;
+    } else {
+      return "https://cdn4.iconfinder.com/data/icons/web-and-mobile-ui/24/UI-33-512.png";
+    }
+  }
+
+  String getUserRole(){
+    if (_org != null){
+      return _org.userRole;
+    } else {
+      return "member";
+    }
+  }
+
+  String getOrgID(){
+    if (_org != null){
+      return _org.orgID;
+    } else {
+      return "Error";
+    }
+  }
+
+  String getOrgName(){
+    if (_org != null){
+      return _org.orgName;
+    } else {
+      return "Error";
+    }
+  }
+}
+
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 class CurrentPage with ChangeNotifier {
   Widget _pageWidget = Overview();
-  String _pageTitle = 'Overview';
+  String _pageTitle = 'Join an Org';
 
   get pageWidget => _pageWidget;
 
