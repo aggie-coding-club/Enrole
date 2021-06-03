@@ -48,6 +48,5 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp"
-    },
-    "emulator.emulatorPath": "C:\\Users\\Beau\\AppData\\Local\\Android\\Sdk\\emulator"
+    }
 }
