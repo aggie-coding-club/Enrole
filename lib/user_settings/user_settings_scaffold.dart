@@ -9,17 +9,18 @@ class UserSettingsScaffold extends StatefulWidget {
   _UserSettingsScaffoldState createState() => _UserSettingsScaffoldState();
 }
 
-class _UserSettingsScaffoldState extends State<UserSettingsScaffold> with AfterInitMixin {
+class _UserSettingsScaffoldState extends State<UserSettingsScaffold>
+    with AfterInitMixin {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseStorage _storage = FirebaseStorage.instance;
-  String userPhotoURL;  
-  bool userProfileEdited = false;
+  String userPhotoURL;
+  bool userProfileEdited = true;
   User _user;
   String _userDisplayName;
 
-  Widget getProfileImage(BuildContext context,  User user) {   
-  Widget profileImage; 
+  Widget getProfileImage(BuildContext context, User user) {
+    Widget profileImage;
 
     try {
       userPhotoURL = user.photoURL;
@@ -46,7 +47,6 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold> with AfterI
   void initState() {
     // TODO: implement initState
     super.initState();
-    
   }
 
   @override
@@ -56,11 +56,8 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold> with AfterI
     _userDisplayName = Provider.of<User>(context).displayName;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile Settings'),
@@ -80,15 +77,16 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold> with AfterI
         child: ListView(
           physics: BouncingScrollPhysics(),
           children: [
+            Text(Provider.of<User>(context).displayName),
             getProfileImage(context, _user),
             ElevatedButton(
               child: Text('Edit profile picture'),
-              onPressed: (){},
+              onPressed: () {},
             ),
             TextFormField(
               initialValue: _user.displayName,
-              onChanged: (value){
-                if(value != _user.displayName){
+              onChanged: (value) {
+                if (value != _user.displayName) {
                   _userDisplayName = value;
                   setState(() {
                     userProfileEdited = true;
@@ -97,19 +95,27 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold> with AfterI
               },
             ),
             ElevatedButton(
-              onPressed: !userProfileEdited 
-              ? null
-              : (){
-                if(_formKey.currentState.validate()){
-                  _user.updateProfile(
-                    displayName: _userDisplayName,
-                  );
-                  setState(() {
-                    userProfileEdited = false;
-                  });
-                }
-              },
+              onPressed: !userProfileEdited
+                  ? null
+                  : () {
+                      if (_formKey.currentState.validate()) {
+                        _user.updateProfile(
+                          displayName: _userDisplayName,
+                        );
+                        setState(() {
+                          userProfileEdited = false;
+                        });
+                      }
+                    },
               child: Text('Update profile'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/login', (Route<dynamic> route) => false);
+                    _auth.signOut();
+              },
+              child: Text('Logout'),
             ),
           ],
         ),

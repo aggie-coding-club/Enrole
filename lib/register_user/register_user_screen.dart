@@ -54,10 +54,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
       try {
         await _auth.createUserWithEmailAndPassword(
             email: _email, password: _password2);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Home()),
-        );
+        Navigator.pushNamed(context, '/home');
       } catch (e) {
         print(e);
       }

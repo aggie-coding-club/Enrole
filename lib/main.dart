@@ -44,7 +44,7 @@ class InitApp extends StatelessWidget {
           return MultiProvider(
             child: MyApp(),
             providers: [
-              StreamProvider<User>(create: (_) => FirebaseAuth.instance.userChanges(), initialData: null),
+              StreamProvider<User>(create: (_) => FirebaseAuth.instance.userChanges(), initialData: null, lazy: false,),
               StreamProvider<UserData>(create: (_) => UserDatabaseService().streamUser(_auth.currentUser.uid), initialData: null,),
               StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],),
               ChangeNotifierProvider<CurrentPage>(create: (_) => CurrentPage(),),
@@ -66,6 +66,7 @@ class InitApp extends StatelessWidget {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -82,11 +83,11 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/',
+      initialRoute: _auth.currentUser == null ? '/login' : '/home',
       routes: {
-        '/': (context) => LoginScreen(),
+        '/login': (context) => LoginScreen(),
         '/register-user': (context) => RegisterUserPage(),
-        '/home': (context) => Home(),
+        '/home': (context) =>Home(),
         '/admin-console': (context) => AdminConsole(),
         '/user-settings': (context) => UserSettingsScaffold(),
       },
@@ -144,10 +145,13 @@ class CurrentOrg with ChangeNotifier{
 class CurrentPage with ChangeNotifier {
   Widget _pageWidget = Overview();
   String _pageTitle = 'Join an Org';
+  String _tag = 'overview';
 
   get pageWidget => _pageWidget;
 
   get pageTitle => _pageTitle;
+
+  get tag => _tag;
 
   set pageWidget(Widget widget){
     _pageWidget = widget;
@@ -156,6 +160,11 @@ class CurrentPage with ChangeNotifier {
 
   set pageTitle(String title){
     _pageTitle = title;
+    notifyListeners();
+  }
+
+  set tag(String tag){
+    _tag = tag;
     notifyListeners();
   }
 }
@@ -176,5 +185,22 @@ class CurrentAdminPage with ChangeNotifier {
   set pageTitle(String title){
     _pageTitle = title;
     notifyListeners();
+  }
+}
+
+class CurrentUser with ChangeNotifier {
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  
+  User _user;
+
+  get user => _user;
+
+  set user (User user){
+    _user = user;
+    notifyListeners();
+  }
+
+  Stream<User> userStream(){
+    return _auth.userChanges();
   }
 }

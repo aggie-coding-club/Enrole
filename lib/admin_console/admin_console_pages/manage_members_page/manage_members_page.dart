@@ -7,6 +7,7 @@ import 'package:after_init/after_init.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'manage_join_requests.dart';
+import 'package:enrole_app_dev/builders/hero_dialog_route.dart';
 
 class ManageMembersPage extends StatefulWidget {
   @override
@@ -136,12 +137,23 @@ Future<List<Widget>> getMemberTiles(BuildContext context) async {
   List<Widget> memberTiles = List.generate(members.length, (index) {
     return Column(
       children: [
-        Container(
-          height: 100.0,
-          width: 100.0,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage(members[index]['userPhotoURL']),
+        Hero(
+          tag: members[index]['userID'],
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  HeroDialogRoute(
+                      builder: (context) => AdminProfilePopupCard(members[index])));
+            },
+            child: Container(
+              height: 100.0,
+              width: 100.0,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(members[index]['userPhotoURL']),
+                ),
+              ),
             ),
           ),
         ),
@@ -154,6 +166,122 @@ Future<List<Widget>> getMemberTiles(BuildContext context) async {
   print('Generated tiles');
 
   return memberTiles;
+}
+
+
+class AdminProfilePopupCard extends StatefulWidget {
+
+  final Map<dynamic, dynamic> memberProfile;
+
+  AdminProfilePopupCard(this.memberProfile);
+
+  @override
+  _AdminProfilePopupCardState createState() => _AdminProfilePopupCardState();
+}
+
+class _AdminProfilePopupCardState extends State<AdminProfilePopupCard> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+    padding: const EdgeInsets.fromLTRB(16.0, 140.0, 16.0, 100.0),
+    child: Material(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: Icon(Icons.clear),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+          Hero(
+            tag: this.widget.memberProfile['userID'],
+            child: Container(
+              height: 150.0,
+              width: 150.0,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(this.widget.memberProfile['userPhotoURL']),
+                ),
+                borderRadius: BorderRadius.circular(75.0),
+              ),
+            ),
+          ),
+          SizedBox(height: 10.0,),
+          Text(
+            this.widget.memberProfile['userDisplayName'],
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              fontSize: 22.0,
+            ),
+          ),
+          Row(
+            children: [
+              Text(this.widget.memberProfile['userRole']),
+              TextButton(
+                onPressed: (){
+                  String _dropdownValue = this.widget.memberProfile['userRole'];
+                  print(_dropdownValue);
+                  showDialog(context: context, builder: (context) => StatefulBuilder(
+                    builder: (context, setState) {
+                      return AlertDialog(
+                        title: Text('Change member role'),
+                        content: DropdownButton(
+                          value: _dropdownValue,
+                          icon: Icon(Icons.arrow_downward_rounded),
+                          onChanged: (String newValue){
+                            setState(() {
+                              _dropdownValue = newValue;
+                            });
+                            
+                          },
+                          items: <String>['member', 'admin', 'owner'].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value.toUpperCase()),
+                            );
+                          }).toList(),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: (){
+                              Navigator.pop(context);
+                            },
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: _dropdownValue != this.widget.memberProfile['userRole'] ? (){
+                              HttpsCallable _changeUserRole = FirebaseFunctions.instance.httpsCallable('changeUserRole');
+                              _changeUserRole.call({
+                                'userID': this.widget.memberProfile['userID'],
+                                'orgID': Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
+                                'newUserRole': _dropdownValue,
+                              });
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Refresh to see changes'),));
+                            } : null,
+                            child: Text('Confirm'),
+                          ),
+                        ],
+                      );
+                    }
+                  ));
+                },
+                child: Text('Change role'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+  }
 }
 
 Widget joinRequests(QuerySnapshot querySnapshot, BuildContext context) {

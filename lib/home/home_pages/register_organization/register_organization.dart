@@ -12,6 +12,7 @@ import 'package:async/async.dart';
 import 'dart:io';
 import 'form_pages/verify_page.dart';
 import 'package:provider/provider.dart';
+import 'package:enrole_app_dev/main.dart';
 
 class organizationInfo {
   final String orgName;
@@ -160,6 +161,11 @@ class _RegisterOrganizationPageState extends State<RegisterOrganizationPage> {
     icon2Color = Colors.black;
     icon3Color = Colors.black;
     school = context.read<UserData>().school;
+    Future.delayed(Duration.zero, () async {
+      if(Provider.of<CurrentPage>(context, listen: false).tag != 'registerOrg'){
+          Provider.of<CurrentPage>(context, listen: false).tag = 'registerOrg';
+        }
+    });
   }
 
   void dispose(){

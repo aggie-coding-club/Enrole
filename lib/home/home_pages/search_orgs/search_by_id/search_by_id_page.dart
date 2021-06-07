@@ -27,11 +27,17 @@ class _SearchByIDPageState extends State<SearchByIDPage>{
   void initState() {
     // TODO: implement initState
     super.initState();
-    
+    Future.delayed(Duration.zero, () async {
+      if(Provider.of<CurrentPage>(context, listen: false).tag != 'searchByID'){
+          Provider.of<CurrentPage>(context, listen: false).tag = 'searchByID';
+        }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+
+    
     return Form(
       key: _formKey,
       child: ListView(
@@ -54,6 +60,7 @@ class _SearchByIDPageState extends State<SearchByIDPage>{
           ElevatedButton(
             child: Text('Search'),
             onPressed: () async {
+              print(Provider.of<CurrentPage>(context, listen: false).tag = 'searchByID');
               DocumentSnapshot orgDoc = await _firestore.collection('orgs').doc(_searchQuery).get();
               if(orgDoc.exists){
                 setState(() {

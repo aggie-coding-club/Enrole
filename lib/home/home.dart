@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:after_init/after_init.dart';
+import 'admin_floating_action_button/admin_floating_action_button.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -40,12 +41,14 @@ class _HomeState extends State<Home> with AfterInitMixin {
     bodyPage = Overview();
     pageTitle = 'Overview';
     context.read<UserData>();
+    
   }
 
   @override
   void didInitState() async {
     // TODO: implement didInitState
-    
+    User initUser = _auth.currentUser;
+    await initUser.reload();
   }
 
   @override
@@ -97,7 +100,9 @@ class _HomeState extends State<Home> with AfterInitMixin {
                           margin: EdgeInsets.all(12.0),
                           child: ElevatedButton(
                             onPressed: () {
-                              Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = AnalyticsPage();
+                              Provider.of<CurrentAdminPage>(context,
+                                      listen: false)
+                                  .pageWidget = AnalyticsPage();
                               Navigator.pushNamed(context, '/admin-console');
                             },
                             child: Text('Admin'),
@@ -154,25 +159,10 @@ class _HomeState extends State<Home> with AfterInitMixin {
           ),
         ),
         body: currentPage.pageWidget,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            // JoinedOrg current = currentOrg.org;
-            // print(current.orgName.toString());
-
-            // HttpsCallable _getOrgMembers =
-            //     FirebaseFunctions.instance.httpsCallable('getOrgMembers');
-
-            // final members = await _getOrgMembers.call(<String, dynamic>{
-            //   'orgID':
-            //       Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
-            // });
-
-            // print(members.data);
-            // print('Done');
-            print(currentUser.emailVerified.toString());
-          },
-          child: Icon(Icons.add),
-        ),
+        floatingActionButton: Visibility(
+          visible: currentPage.tag != 'registerOrg' && currentPage.tag != 'searchByID',
+          child: AdminFloatingActionButton(),
+        ) ,
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: 0,
           showUnselectedLabels: false,
@@ -217,13 +207,14 @@ class _DrawerItemsState extends State<DrawerItems> {
                 children: [
                   CircleAvatar(
                     radius: 40.0,
-                    backgroundImage: NetworkImage(Provider.of<User>(context).photoURL),
+                    backgroundImage:
+                        NetworkImage(Provider.of<User>(context).photoURL),
                   ),
                   Expanded(
                     child: Container(),
                   ),
                   TextButton(
-                    onPressed: (){
+                    onPressed: () {
                       Navigator.of(context).pushNamed('/user-settings');
                     },
                     child: Text(
