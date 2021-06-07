@@ -1,3 +1,5 @@
+
+
 // import 'dart:js';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,7 +14,7 @@ class Announcement {
   String authorProfilePicURL = 'URL';
   // Date timePosted;
   // List<String> seenBy;
-  
+
 
   Announcement({this.title, this.body, this.author, this.authorProfilePicURL});
 }
@@ -42,10 +44,10 @@ class _AnnouncementsState extends State<Announcements> {
         List<DocumentSnapshot> documents = querySnapshot.docs;
         announcements = List.generate(documents.length, (index) {
           return Announcement(
-            title: documents[index].data()['title'],
-            body: documents[index].data()['body'],
-            author: documents[index].data()['author'],
-            authorProfilePicURL: documents[index].data()['authorProfilePic']
+              title: documents[index].data()['title'],
+              body: documents[index].data()['body'],
+              author: documents[index].data()['author'],
+              authorProfilePicURL: documents[index].data()['authorProfilePic']
           );
         });
       });
@@ -80,52 +82,47 @@ class _AnnouncementsState extends State<Announcements> {
             child: InkWell(
               onTap: () {
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Expanded_Announcement(index: ind))
+                    context,
+                    MaterialPageRoute(builder: (context) => Expanded_Announcement(index: ind))
                 );
               },
               child: Card(
                 margin: EdgeInsets.all(15.0),
-                child: ExpansionTile(
-                    childrenPadding: EdgeInsets.all(10.0), //this is the padding between each announcement tile
-                    leading: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.red,
-                        image: DecorationImage(
-                          image: NetworkImage(imageURL),
-                          fit: BoxFit.cover,
-                        ),
+                child: ListTile(
+                  subtitle: Text(
+                    body, //trying to use my ExpandableText object expandable_body, but it is not working
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10.0,
+                      color: Colors.deepPurple,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  leading: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.red,
+                      image: DecorationImage(
+                        image: NetworkImage(imageURL),
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    title: Text(title),
-                    children: <Widget>[
-                      ListTile(
-                        subtitle: Text(
-                          body, //trying to use my ExpandableText object expandable_body, but it is not working
-                          style: TextStyle(
-                            fontSize: 10.0,
-                            color: Colors.deepPurple,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        trailing: Text(author),
-                      ),
-                    ]
+                  ),
+                  trailing: Text(author),
                 ),
               ),
             ),
           ),
         ]
-      );
+    );
   }
 
 
   Widget announcementTilesListView(List<Announcement> announcementsData) {
     List<Widget> announcementTiles =
-        List.generate(announcementsData.length, (index) {
+    List.generate(announcementsData.length, (index) {
       return announcement(announcementsData[index].title, announcementsData[index].body, announcementsData[index].author, announcementsData[index].authorProfilePicURL, index);
     });
     return ListView(
@@ -216,11 +213,11 @@ class Expanded_Announcement extends StatelessWidget {
       ),
       body: Center(
         child: Container(
-          padding: EdgeInsets.all(15.0),
-          child: Text(
-            body,
-            style: TextStyle(fontSize: 22),
-          )
+            padding: EdgeInsets.all(15.0),
+            child: Text(
+              body,
+              style: TextStyle(fontSize: 22),
+            )
         ),
       ),
     );
