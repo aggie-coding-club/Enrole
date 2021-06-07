@@ -11,6 +11,9 @@ import 'package:enrole_app_dev/main.dart';
 =======
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:after_init/after_init.dart';
+<<<<<<< HEAD
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
+=======
 >>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 class VerifyPage extends StatefulWidget {
@@ -36,8 +39,11 @@ class VerifyPage extends StatefulWidget {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class _VerifyPageState extends State<VerifyPage> {
 =======
+=======
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
   
 >>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
@@ -58,6 +64,7 @@ class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
   User _user;
 
   Future<Widget> isEmailVerified(BuildContext context) async {
+<<<<<<< HEAD
 <<<<<<< HEAD
     try {
       final user = context.watch<User>();
@@ -123,6 +130,8 @@ class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
     } catch (e) {
       print(e);
 =======
+=======
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
  
     try{
     if(_user.emailVerified){
@@ -215,6 +224,9 @@ class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
         });
 =======
         print('Invoked callable');
+<<<<<<< HEAD
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
+=======
 >>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
         var currentPage = Provider.of<CurrentPage>(context, listen: false);
         currentPage.pageWidget = Overview();
@@ -228,6 +240,12 @@ class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didInitState() {
+    // TODO: implement didInitState
+    _user = Provider.of<User>(context);
   }
 
   @override
@@ -251,6 +269,8 @@ class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
     bool isNameDone =
         this.widget.orgName != null && this.widget.orgName.length >= 3;
 =======
+
+    _user = Provider.of<User>(context);
 
     _user = Provider.of<User>(context);
 

@@ -14,6 +14,9 @@ import 'package:enrole_app_dev/main.dart';
 =======
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:after_init/after_init.dart';
+<<<<<<< HEAD
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
+=======
 >>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 class Home extends StatefulWidget {
@@ -71,6 +74,12 @@ class _HomeState extends State<Home> with AfterInitMixin {
   }
 
   @override
+  void didInitState() async {
+    // TODO: implement didInitState
+    
+  }
+
+  @override
   Widget build(BuildContext context) {
 <<<<<<< HEAD
     return Consumer<CurrentPage>(
@@ -90,6 +99,9 @@ class _HomeState extends State<Home> with AfterInitMixin {
 
     return Consumer3<CurrentPage, CurrentOrg, User>(
       builder: (_, currentPage, currentOrg, currentUser, __) => Scaffold(
+<<<<<<< HEAD
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
+=======
 >>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
         key: _scaffoldKey,
         resizeToAvoidBottomInset: true,

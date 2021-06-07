@@ -16,6 +16,9 @@ import 'admin_console/admin_console_scaffold.dart';
 import 'admin_console/admin_console_pages/analytics_page/analytics_page.dart';
 import 'user_settings/user_settings_scaffold.dart';
 import 'package:flutter/services.dart';
+<<<<<<< HEAD
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
+=======
 >>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 void main() {
@@ -106,7 +109,10 @@ class MyApp extends StatelessWidget {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 class CurrentOrg with ChangeNotifier{
   JoinedOrg _org;
@@ -155,6 +161,28 @@ class CurrentOrg with ChangeNotifier{
 class CurrentPage with ChangeNotifier {
   Widget _pageWidget = Overview();
   String _pageTitle = 'Join an Org';
+<<<<<<< HEAD
+=======
+
+  get pageWidget => _pageWidget;
+
+  get pageTitle => _pageTitle;
+
+  set pageWidget(Widget widget){
+    _pageWidget = widget;
+    notifyListeners();
+  }
+
+  set pageTitle(String title){
+    _pageTitle = title;
+    notifyListeners();
+  }
+}
+
+class CurrentAdminPage with ChangeNotifier {
+  Widget _pageWidget = AnalyticsPage();
+  String _pageTitle = 'Analytics';
+>>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
   get pageWidget => _pageWidget;
 
