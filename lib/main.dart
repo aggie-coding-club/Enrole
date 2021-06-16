@@ -10,16 +10,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:enrole_app_dev/services/globals.dart';
-<<<<<<< HEAD
-=======
 import 'admin_console/admin_console_scaffold.dart';
 import 'admin_console/admin_console_pages/analytics_page/analytics_page.dart';
 import 'user_settings/user_settings_scaffold.dart';
 import 'package:flutter/services.dart';
-<<<<<<< HEAD
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
-=======
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,27 +38,18 @@ class InitApp extends StatelessWidget {
             textDirection: TextDirection.ltr,
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
+
           FirebaseAuth _auth = FirebaseAuth.instance;
 
           return MultiProvider(
             child: MyApp(),
             providers: [
-              StreamProvider<User>(
-                  create: (_) => FirebaseAuth.instance.authStateChanges(),
-                  initialData: null),
-              StreamProvider<UserData>(
-                create: (_) =>
-                    UserDatabaseService().streamUser(_auth.currentUser.uid),
-                initialData: null,
-              ),
-              StreamProvider<List<JoinedOrg>>(
-                create: (_) => UserDatabaseService()
-                    .streamJoinedOrgs(_auth.currentUser.uid),
-                initialData: [],
-              ),
-              ChangeNotifierProvider<CurrentPage>(
-                create: (_) => CurrentPage(),
-              )
+              StreamProvider<User>(create: (_) => FirebaseAuth.instance.userChanges(), initialData: null),
+              StreamProvider<UserData>(create: (_) => UserDatabaseService().streamUser(_auth.currentUser.uid), initialData: null,),
+              StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],),
+              ChangeNotifierProvider<CurrentPage>(create: (_) => CurrentPage(),),
+              ChangeNotifierProvider<CurrentOrg>(create: (_) => CurrentOrg(),),
+              ChangeNotifierProvider<CurrentAdminPage>(create: (_) => CurrentAdminPage(),),
             ],
           );
         } else {
@@ -81,11 +66,13 @@ class InitApp extends StatelessWidget {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        canvasColor: Colors.white,
         primarySwatch: Colors.blue,
         primaryColor: Colors.blue[700],
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -100,6 +87,8 @@ class MyApp extends StatelessWidget {
         '/': (context) => LoginScreen(),
         '/register-user': (context) => RegisterUserPage(),
         '/home': (context) => Home(),
+        '/admin-console': (context) => AdminConsole(),
+        '/user-settings': (context) => UserSettingsScaffold(),
       },
       navigatorObservers: [
         FirebaseAnalyticsObserver(analytics: Global.analytics),
@@ -108,11 +97,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 class CurrentOrg with ChangeNotifier{
   JoinedOrg _org;
@@ -157,12 +141,9 @@ class CurrentOrg with ChangeNotifier{
   }
 }
 
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 class CurrentPage with ChangeNotifier {
   Widget _pageWidget = Overview();
   String _pageTitle = 'Join an Org';
-<<<<<<< HEAD
-=======
 
   get pageWidget => _pageWidget;
 
@@ -182,18 +163,17 @@ class CurrentPage with ChangeNotifier {
 class CurrentAdminPage with ChangeNotifier {
   Widget _pageWidget = AnalyticsPage();
   String _pageTitle = 'Analytics';
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
   get pageWidget => _pageWidget;
 
   get pageTitle => _pageTitle;
 
-  set pageWidget(Widget widget) {
+  set pageWidget(Widget widget){
     _pageWidget = widget;
     notifyListeners();
   }
 
-  set pageTitle(String title) {
+  set pageTitle(String title){
     _pageTitle = title;
     notifyListeners();
   }

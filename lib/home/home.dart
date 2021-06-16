@@ -1,3 +1,4 @@
+import 'package:enrole_app_dev/admin_console/admin_console_pages/analytics_page/analytics_page.dart';
 import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'package:flutter/material.dart';
 import 'home_pages/overview.dart';
@@ -10,14 +11,8 @@ import 'builders/app_bar_actions.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
-<<<<<<< HEAD
-=======
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:after_init/after_init.dart';
-<<<<<<< HEAD
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
-=======
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
 
 class Home extends StatefulWidget {
   @override
@@ -33,30 +28,11 @@ class _HomeState extends State<Home> with AfterInitMixin {
 
   String pageTitle;
 
-  JoinedOrg _currentOrg;
-
-  String _role;
-
-  Future<List<JoinedOrg>> _orgs;
-
   String usersSchool;
 
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
 //TODO: User provider to constantly monitor and update user data
-
-  Function bodyPageCallback(Widget newPage, String newPageTitle) {
-    setState(() {
-      bodyPage = newPage;
-      pageTitle = newPageTitle;
-    });
-  }
-
-  Function changeOrgCallback(JoinedOrg newOrg) {
-    setState(() {
-      _currentOrg = newOrg;
-    });
-  }
 
   @override
   void initState() {
@@ -64,13 +40,6 @@ class _HomeState extends State<Home> with AfterInitMixin {
     bodyPage = Overview();
     pageTitle = 'Overview';
     context.read<UserData>();
-    context.read<List<JoinedOrg>>();
-  }
-
-  @override
-  void didInitState() async {
-    // TODO: implement didInitState
-    
   }
 
   @override
@@ -81,10 +50,6 @@ class _HomeState extends State<Home> with AfterInitMixin {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-    return Consumer<CurrentPage>(
-      builder: (_, currentPage, __) => Scaffold(
-=======
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Provider.of<CurrentOrg>(context, listen: false).org == null &&
           Provider.of<List<JoinedOrg>>(context, listen: false) != null &&
@@ -99,10 +64,6 @@ class _HomeState extends State<Home> with AfterInitMixin {
 
     return Consumer3<CurrentPage, CurrentOrg, User>(
       builder: (_, currentPage, currentOrg, currentUser, __) => Scaffold(
-<<<<<<< HEAD
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
-=======
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
         key: _scaffoldKey,
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
@@ -128,13 +89,18 @@ class _HomeState extends State<Home> with AfterInitMixin {
               ),
             ),
             actions: [
-              _currentOrg != null
-                  ? _currentOrg.userRole == 'admin'
+              Provider.of<CurrentOrg>(context).org != null
+                  ? Provider.of<CurrentOrg>(context).getUserRole() == "admin" ||
+                          Provider.of<CurrentOrg>(context).getUserRole() ==
+                              "owner"
                       ? Container(
                           margin: EdgeInsets.all(12.0),
                           child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text('Admin Console'),
+                            onPressed: () {
+                              Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = AnalyticsPage();
+                              Navigator.pushNamed(context, '/admin-console');
+                            },
+                            child: Text('Admin'),
                           ),
                         )
                       : Container()
@@ -142,34 +108,29 @@ class _HomeState extends State<Home> with AfterInitMixin {
               Container(
                 margin: EdgeInsets.fromLTRB(9.0, 0.0, 10.0, 0.0),
                 child: Center(
-                  child: PopupMenuButton(
-                    onSelected: (value) {
-                      if (value == 998) {
-                        setState(() {
-                          var currentPage =
-                              Provider.of<CurrentPage>(context, listen: false);
-                          currentPage.pageWidget = SearchOrgs();
-                          currentPage.pageTitle = 'Search your School\'s Orgs';
-                        });
-                      }
-                      if (value == 999) {
-                        setState(() {
-                          var currentPage =
-                              Provider.of<CurrentPage>(context, listen: false);
-                          currentPage.pageWidget = RegisterOrganizationPage();
-                          currentPage.pageTitle = 'Register an Organization';
-                        });
-                      }
+                  child: GestureDetector(
+                    onTap: () {
+                      _scaffoldKey.currentState.openEndDrawer();
                     },
-                    padding: EdgeInsets.all(0.0),
-                    elevation: 2.0,
-                    offset: Offset(50, 50),
-                    iconSize: 30.0,
-                    icon: Icon(Icons.add_circle_outline_sharp),
-                    itemBuilder: (context) {
-                      return orgListMenuItems(context);
-                    },
-                    initialValue: 0,
+                    child: Provider.of<CurrentOrg>(context).org == null
+                        ? Icon(
+                            Icons.add_box_outlined,
+                            size: 40.0,
+                            color: Theme.of(context).primaryColor,
+                          )
+                        : Container(
+                            height: 40.0,
+                            width: 40.0,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5.0),
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                    Provider.of<CurrentOrg>(context)
+                                        .getOrgURL()),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -181,11 +142,18 @@ class _HomeState extends State<Home> with AfterInitMixin {
           ),
         ),
         drawer: Drawer(
-          child: drawerItems(),
+          child: DrawerItems(),
+        ),
+        endDrawer: Drawer(
+          child: Container(
+            padding: EdgeInsets.all(12.0),
+            child: ListView(
+              physics: BouncingScrollPhysics(),
+              children: orgPanelTiles(context),
+            ),
+          ),
         ),
         body: currentPage.pageWidget,
-<<<<<<< HEAD
-=======
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             // JoinedOrg current = currentOrg.org;
@@ -222,18 +190,17 @@ class _HomeState extends State<Home> with AfterInitMixin {
             ),
           ],
         ),
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
       ),
     );
   }
 }
 
-class drawerItems extends StatefulWidget {
+class DrawerItems extends StatefulWidget {
   @override
-  _drawerItemsState createState() => _drawerItemsState();
+  _DrawerItemsState createState() => _DrawerItemsState();
 }
 
-class _drawerItemsState extends State<drawerItems> {
+class _DrawerItemsState extends State<DrawerItems> {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
@@ -241,35 +208,33 @@ class _drawerItemsState extends State<drawerItems> {
     return ListView(
       children: [
         DrawerHeader(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CircleAvatar(
                     radius: 40.0,
                     backgroundImage: NetworkImage(Provider.of<User>(context).photoURL),
                   ),
-                  Container(
-                    height: 30.0,
-                    child: Row(
-                      children: [
-                        Container(
-                            margin: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text(_auth.currentUser.email)),
-                      ],
+                  Expanded(
+                    child: Container(),
+                  ),
+                  TextButton(
+                    onPressed: (){
+                      Navigator.of(context).pushNamed('/user-settings');
+                    },
+                    child: Text(
+                      'Settings',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
                   ),
-                  Text(context.read<UserData>().school),
                 ],
               ),
-<<<<<<< HEAD
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.settings),
-=======
               Container(
                 height: 30.0,
                 child: Row(
@@ -279,8 +244,8 @@ class _drawerItemsState extends State<drawerItems> {
                         child: Text(Provider.of<User>(context).displayName)),
                   ],
                 ),
->>>>>>> 0029a7830a297f7a75eb3e76755c5161b6978674
               ),
+              Text(context.read<UserData>().school),
             ],
           ),
           decoration: BoxDecoration(
@@ -292,7 +257,10 @@ class _drawerItemsState extends State<drawerItems> {
             title: Text('Overview'),
             trailing: Icon(Icons.home),
             onTap: () {
-              Provider.of<CurrentPage>(context);
+              var currentPage =
+                  Provider.of<CurrentPage>(context, listen: false);
+              currentPage.pageWidget = Overview();
+              currentPage.pageTitle = 'Overview';
               Navigator.pop(context);
             },
           ),

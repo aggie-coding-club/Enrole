@@ -16,15 +16,14 @@ class GeneralInfoFormPage extends StatefulWidget {
   final Function hidePageControllers;
   final Function showPageControllers;
 
-  GeneralInfoFormPage({
-    this.orgName,
-    this.orgType,
-    this.school,
-    this.showPageControllers,
-    this.hidePageControllers,
-    this.setName,
-    this.setType,
-  });
+  GeneralInfoFormPage(
+      {this.orgName,
+      this.orgType,
+      this.school,
+      this.showPageControllers,
+      this.hidePageControllers,
+      this.setName,
+      this.setType,});
 
   @override
   _GeneralInfoFormPageState createState() => _GeneralInfoFormPageState();

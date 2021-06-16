@@ -1,5 +1,3 @@
-
-
 // import 'dart:js';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -152,22 +150,106 @@ class _AnnouncementsState extends State<Announcements> {
   }
 }
 
-class Expanded_Announcement extends StatelessWidget {
+// class Expanded_Announcement extends StatelessWidget {
+//   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+//
+//   _AnnouncementsState anc_state = new _AnnouncementsState();
+//   Future<List<Announcement>> announcementData;
+//   Expanded_Announcement exp_anc;
+//   int index; //This index variable displays the correct announcement that's clicked on
+//
+//   Expanded_Announcement({index = 0}) {
+//     announcementData = anc_state.announcementsData();
+//     this.index = index;
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     Expanded_Announcement();
+//
+//     return FutureBuilder(
+//         future: announcementData,
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.done) {
+//             List<Announcement> announcementData = snapshot.data;
+//             if (announcementData != null) {
+//               return expandedAnnouncementView(announcementData, context);
+//             } else {
+//               return Text('Sorry, no data :(');
+//             }
+//           } else {
+//             return CircularProgressIndicator();
+//           }
+//         }
+//     );
+//   }
+//
+//   Widget expandedAnnouncement(String title, String body, String author, String imageURL, BuildContext context){
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(title),
+//         leading: ElevatedButton(
+//           onPressed: () {
+//             Navigator.pop(context);
+//           },
+//           child: Icon(Icons.arrow_left),
+//         ),
+//         actions: [
+//           Container(
+//             width: 60,
+//             height: 60,
+//             decoration: BoxDecoration(
+//               shape: BoxShape.circle,
+//               color: Colors.red,
+//               image: DecorationImage(
+//                 image: NetworkImage(imageURL),
+//                 fit: BoxFit.cover,
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//       body: Center(
+//         child: Container(
+//             padding: EdgeInsets.all(15.0),
+//             child: Text(
+//               body,
+//               style: TextStyle(fontSize: 22),
+//             )
+//         ),
+//       ),
+//     );
+//   }
+//
+//
+//   Widget expandedAnnouncementView(List<Announcement> announcementsData, BuildContext context) {
+//     return expandedAnnouncement(announcementsData[index].title, announcementsData[index].body, announcementsData[index].author, announcementsData[index].authorProfilePicURL, context);
+//   }
+// }
+
+class Expanded_Announcement extends StatefulWidget {
+  const Expanded_Announcement({Key key}) : super(key: key);
+
+  @override
+  _Expanded_AnnouncementState createState() => _Expanded_AnnouncementState();
+}
+
+class _Expanded_AnnouncementState extends State<Expanded_Announcement> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   _AnnouncementsState anc_state = new _AnnouncementsState();
   Future<List<Announcement>> announcementData;
-  Expanded_Announcement exp_anc;
+  _Expanded_AnnouncementState exp_anc;
   int index; //This index variable displays the correct announcement that's clicked on
 
-  Expanded_Announcement({index = 0}) {
+  _Expanded_AnnouncementState({index = 0}) {
     announcementData = anc_state.announcementsData();
     this.index = index;
   }
 
   @override
   Widget build(BuildContext context) {
-    Expanded_Announcement();
+    _Expanded_AnnouncementState();
 
     return FutureBuilder(
         future: announcementData,
@@ -227,6 +309,8 @@ class Expanded_Announcement extends StatelessWidget {
   Widget expandedAnnouncementView(List<Announcement> announcementsData, BuildContext context) {
     return expandedAnnouncement(announcementsData[index].title, announcementsData[index].body, announcementsData[index].author, announcementsData[index].authorProfilePicURL, context);
   }
-
-
 }
+
+
+
+
