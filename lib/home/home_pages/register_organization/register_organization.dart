@@ -2,7 +2,6 @@ import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:enrole_app_dev/builders/school_search.dart';
 import 'form_pages/general_info.dart';
 import 'form_pages/org_profile.dart';
@@ -11,7 +10,7 @@ import 'form_pages/payment_page.dart';
 import 'package:async/async.dart';
 import 'dart:io';
 import 'form_pages/verify_page.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enrole_app_dev/main.dart';
 
 class organizationInfo {
@@ -160,10 +159,10 @@ class _RegisterOrganizationPageState extends State<RegisterOrganizationPage> {
     icon1Color = Colors.white;
     icon2Color = Colors.black;
     icon3Color = Colors.black;
-    school = context.read<UserData>().school;
+    school = context.read(userDataProvider).data.value.school;
     Future.delayed(Duration.zero, () async {
-      if(Provider.of<CurrentPage>(context, listen: false).tag != 'registerOrg'){
-          Provider.of<CurrentPage>(context, listen: false).tag = 'registerOrg';
+      if(context.read(currentPageProvider).tag != 'registerOrg'){
+          context.read(currentPageProvider).tag = 'registerOrg';
         }
     });
   }
@@ -174,9 +173,7 @@ class _RegisterOrganizationPageState extends State<RegisterOrganizationPage> {
   }
   @override
   Widget build(BuildContext context) {
-    return Provider(
-      create: (_) => organizationInfo(),
-          child: GestureDetector(
+    return GestureDetector(
         onTap: (){
           FocusScopeNode currentFocus = FocusScope.of(context);
           if(!currentFocus.hasPrimaryFocus){
@@ -269,8 +266,7 @@ class _RegisterOrganizationPageState extends State<RegisterOrganizationPage> {
             currentPageControllers,
           ],
         ),
-      ),
-    );
+      );
   }
 }
 

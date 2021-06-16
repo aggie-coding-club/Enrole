@@ -1,11 +1,12 @@
 import 'package:enrole_app_dev/keys.dart';
 import 'package:enrole_app_dev/builders/school_search.dart';
 import 'package:enrole_app_dev/home/home_pages/search_orgs/school_search_popup.dart';
+import 'package:enrole_app_dev/main.dart';
 import 'package:flutter/material.dart';
 import 'package:algolia/algolia.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'org_public_profile.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 
 
@@ -40,7 +41,7 @@ class _SearchOrgsState extends State<SearchOrgs> {
   
   Future<List<Widget>> searchResults({String search, BuildContext context}) async {
     List<Widget> tiles;
-    String school = context.read<UserData>().school;
+    String school = context.read(userDataProvider).data.value.school;
     try{
       AlgoliaQuerySnapshot querySnap = await _algolia.index('orgs').query(search).facetFilter('school:$school').getObjects();
       List<AlgoliaObjectSnapshot> results = querySnap.hits;

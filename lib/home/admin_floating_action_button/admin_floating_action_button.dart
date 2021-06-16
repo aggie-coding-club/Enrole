@@ -1,8 +1,9 @@
 import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:provider/provider.dart';
 import 'package:enrole_app_dev/main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AdminFloatingActionButton extends StatefulWidget {
   // const AdminFloatingActionButton({ Key? key }) : super(key: key);
@@ -14,11 +15,18 @@ class AdminFloatingActionButton extends StatefulWidget {
 class _AdminFloatingActionButtonState extends State<AdminFloatingActionButton> {
 
   JoinedOrg _currentOrg;
+
+  FirebaseAuth _auth = FirebaseAuth.instance;
   
   @override
   Widget build(BuildContext context) {
 
     return SpeedDial(
+      // onPress: (){
+      //   _auth.signOut();
+      //   print(context.read(joinedOrgsProvider).toString());
+      //   print(context.read(currentOrgProvider).org.toString());
+      // },
       buttonSize: 56.0,
       icon: Icons.add,
       activeIcon: Icons.keyboard_arrow_right_rounded,

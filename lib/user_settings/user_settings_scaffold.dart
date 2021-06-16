@@ -1,16 +1,16 @@
+import 'package:enrole_app_dev/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:provider/provider.dart';
-import 'package:after_init/after_init.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 class UserSettingsScaffold extends StatefulWidget {
   @override
   _UserSettingsScaffoldState createState() => _UserSettingsScaffoldState();
 }
 
-class _UserSettingsScaffoldState extends State<UserSettingsScaffold>
-    with AfterInitMixin {
+class _UserSettingsScaffoldState extends State<UserSettingsScaffold>{
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseStorage _storage = FirebaseStorage.instance;
@@ -47,13 +47,10 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold>
   void initState() {
     // TODO: implement initState
     super.initState();
-  }
-
-  @override
-  void didInitState() {
-    // TODO: implement didInitState
-    _user = Provider.of<User>(context);
-    _userDisplayName = Provider.of<User>(context).displayName;
+    WidgetsBinding.instance.addPostFrameCallback((_){
+    _user = context.read(userProvider).data.value;
+    _userDisplayName = _user.displayName;
+  }); 
   }
 
   @override
@@ -77,7 +74,7 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold>
         child: ListView(
           physics: BouncingScrollPhysics(),
           children: [
-            Text(Provider.of<User>(context).displayName),
+            Text(_userDisplayName),
             getProfileImage(context, _user),
             ElevatedButton(
               child: Text('Edit profile picture'),
@@ -99,9 +96,7 @@ class _UserSettingsScaffoldState extends State<UserSettingsScaffold>
                   ? null
                   : () {
                       if (_formKey.currentState.validate()) {
-                        _user.updateProfile(
-                          displayName: _userDisplayName,
-                        );
+                        _user.updateDisplayName(_userDisplayName);
                         setState(() {
                           userProfileEdited = false;
                         });

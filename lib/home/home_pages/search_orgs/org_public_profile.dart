@@ -1,10 +1,9 @@
 import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:algolia/algolia.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enrole_app_dev/main.dart';
 
 class OrgPublicProfile extends StatefulWidget {
@@ -27,13 +26,13 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
 
   HttpsCallable _joinRequest = FirebaseFunctions.instance.httpsCallable('joinRequest');
 
-  Widget joinTile(String orgType, String orgID){
+  Widget joinTile(String orgType, String orgID, ScopedReader watch){
     String titleString;
 //      String subString;
     Color cardColor;
     Color textColor;
 
-    List<JoinedOrg> joinedOrgs = Provider.of<List<JoinedOrg>>(this.widget.context);
+    List<JoinedOrg> joinedOrgs = watch(joinedOrgsProvider).data.value ?? [];
     List<String> orgIDs = List.generate(joinedOrgs.length, (index) {
       return joinedOrgs[index].orgID;
     });
@@ -261,17 +260,21 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                       Container(
                         height: 50.0,
                         padding: EdgeInsets.fromLTRB(14.0, 8.0, 14.0, 8.0),
-                        child: joinTile(this.widget.orgData.data['orgType'], this.widget.orgData.data['orgID']),
+                        child: Consumer(
+                          builder: (context, watch, child) {
+                            return joinTile(this.widget.orgData.data['orgType'], this.widget.orgData.data['orgID'], watch);
+                          }
+                        ),
                       ),
                       Container(
                         margin: EdgeInsets.all(14.0),
                         child: Row(
                           children: [
-                            Icon(AntDesign.instagram, size: 35.0, color: Colors.pink[800],),
-                            SizedBox(width: 12.0,),
-                            Icon(AntDesign.facebook_square, size: 35.0, color: Colors.blue[700],),
-                            SizedBox(width: 12.0,),
-                            Icon(AntDesign.linkedin_square, size: 35.0, color: Colors.blue[800],),
+                            // Icon(AntDesign.instagram, size: 35.0, color: Colors.pink[800],),
+                            // SizedBox(width: 12.0,),
+                            // Icon(AntDesign.facebook_square, size: 35.0, color: Colors.blue[700],),
+                            // SizedBox(width: 12.0,),
+                            // Icon(AntDesign.linkedin_square, size: 35.0, color: Colors.blue[800],),
                           ],
                         ),
                       ),

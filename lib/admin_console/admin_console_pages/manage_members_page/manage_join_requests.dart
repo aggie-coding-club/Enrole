@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enrole_app_dev/main.dart';
-import 'package:after_init/after_init.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class ManageJoinRequestsPage extends StatefulWidget {
@@ -10,16 +9,17 @@ class ManageJoinRequestsPage extends StatefulWidget {
   _ManageJoinRequestsPageState createState() => _ManageJoinRequestsPageState();
 }
 
-class _ManageJoinRequestsPageState extends State<ManageJoinRequestsPage>
-    with AfterInitMixin {
+class _ManageJoinRequestsPageState extends State<ManageJoinRequestsPage> {
   Stream requestStream;
 
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Stream joinRequestStream(BuildContext context) {
+    final _orgID = context.read(currentOrgProvider).getOrgID();
+
     return _firestore
         .collection('orgs')
-        .doc(Provider.of<CurrentOrg>(context).getOrgID())
+        .doc(_orgID)
         .collection('join-requests')
         .snapshots();
   }
@@ -28,12 +28,14 @@ class _ManageJoinRequestsPageState extends State<ManageJoinRequestsPage>
   void initState() {
     // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      requestStream = joinRequestStream(context);
+    });
   }
 
   @override
   void didInitState() {
     // TODO: implement didInitState
-    requestStream = joinRequestStream(context);
   }
 
   @override
@@ -47,12 +49,10 @@ class _ManageJoinRequestsPageState extends State<ManageJoinRequestsPage>
     return Scaffold(
         appBar: AppBar(
           title: Text('Manage join requests'),
-          iconTheme: IconThemeData(
-            color: Colors.white
-          ),
+          iconTheme: IconThemeData(color: Colors.white),
           leading: IconButton(
             icon: Icon(Icons.clear),
-            onPressed: (){
+            onPressed: () {
               Navigator.pop(context);
             },
           ),
@@ -79,6 +79,8 @@ Widget requestTiles(QuerySnapshot querySnapshot, BuildContext context) {
   HttpsCallable _acceptRequest =
       FirebaseFunctions.instance.httpsCallable('acceptJoinRequest');
 
+  String _orgID = context.read(currentOrgProvider).getOrgID();
+
   List<Widget> tiles = List.generate(querySnapshot.size, (index) {
     return Card(
       child: ListTile(
@@ -91,7 +93,7 @@ Widget requestTiles(QuerySnapshot querySnapshot, BuildContext context) {
               onPressed: () {
                 _acceptRequest.call(<String, dynamic>{
                   'userID': querySnapshot.docs[index]['userID'],
-                  'orgID': Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
+                  'orgID': _orgID,
                 });
               },
             ),
@@ -106,11 +108,10 @@ Widget requestTiles(QuerySnapshot querySnapshot, BuildContext context) {
           height: 55.0,
           width: 55.0,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage(querySnapshot.docs[index]['userPhotoURL']),
-            ),
-            borderRadius: BorderRadius.circular(8.0)
-          ),
+              image: DecorationImage(
+                image: NetworkImage(querySnapshot.docs[index]['userPhotoURL']),
+              ),
+              borderRadius: BorderRadius.circular(8.0)),
         ),
       ),
     );

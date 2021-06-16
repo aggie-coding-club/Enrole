@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:enrole_app_dev/main.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Overview extends StatefulWidget {
   @override
@@ -14,8 +14,8 @@ class _OverviewState extends State<Overview> {
     // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero, () async {
-      if(Provider.of<CurrentPage>(context, listen: false).tag != 'overview'){
-          Provider.of<CurrentPage>(context, listen: false).tag = 'overview';
+      if(context.read(currentPageProvider).tag != 'overview'){
+          context.read(currentPageProvider).tag = 'overview';
         }
     });
   }

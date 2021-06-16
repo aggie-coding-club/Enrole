@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 
 class Page0Controllers extends StatefulWidget {
   final PageController _pageController;
@@ -15,7 +14,7 @@ class _Page0ControllersState extends State<Page0Controllers> {
     return Positioned(
       right: 8.0,
       bottom: 8.0,
-      child: FlatButton(
+      child: TextButton(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -30,7 +29,7 @@ class _Page0ControllersState extends State<Page0Controllers> {
             ),
             SizedBox(width: 10.0,),
             Icon(
-              AntDesign.arrowright,
+              Icons.arrow_right,
               size: 25.0,
               color: Theme.of(context).primaryColor,
             )
@@ -64,11 +63,11 @@ class _Page1ControllersState extends State<Page1Controllers> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          FlatButton(
+          TextButton(
             child: Row(
               children: [
                 Icon(
-                  AntDesign.arrowleft,
+                  Icons.arrow_left,
                   size: 25.0,
                   color: Theme.of(context).primaryColor,
                 ),
@@ -87,7 +86,7 @@ class _Page1ControllersState extends State<Page1Controllers> {
               this.widget._pageController.animateToPage(0, duration: Duration(milliseconds: 800), curve: Curves.bounceOut);
             },
           ),
-          FlatButton(
+          TextButton(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -102,7 +101,7 @@ class _Page1ControllersState extends State<Page1Controllers> {
                 ),
                 SizedBox(width: 10.0,),
                 Icon(
-                  AntDesign.arrowright,
+                  Icons.arrow_right,
                   size: 25.0,
                   color: Theme.of(context).primaryColor,
                 )
@@ -132,13 +131,13 @@ class _Page2ControllersState extends State<Page2Controllers> {
     return Positioned(
       left: 8.0,
       bottom: 8.0,
-      child: FlatButton(
+      child: TextButton(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
-              AntDesign.arrowleft,
+              Icons.arrow_left,
               size: 25.0,
               color: Theme.of(context).primaryColor,
             ),

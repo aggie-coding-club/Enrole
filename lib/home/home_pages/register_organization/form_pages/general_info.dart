@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:enrole_app_dev/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:enrole_app_dev/builders/school_search.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 
 class GeneralInfoFormPage extends StatefulWidget {
@@ -72,7 +72,7 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                         style: TextStyle(
                             fontSize: 18.0, fontWeight: FontWeight.bold),
                       ),
-                      Text(context.read<UserData>().school),
+                      Text(context.read(userDataProvider).when(data: (data)=>data.school, loading: ()=> 'loading...', error: (error, _)=> 'An error occurred retrieving your school')),
                       SizedBox(height: 12.0),
                       TextField(
                         controller: nameController,
@@ -154,7 +154,7 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                       ),
                       IconButton(
                         icon: Icon(
-                          AntDesign.questioncircleo,
+                          Icons.check_box_outline_blank_outlined,
                           color: Theme.of(context).primaryColor,
                         ),
                         onPressed: () {

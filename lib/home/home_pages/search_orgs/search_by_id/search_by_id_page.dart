@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:enrole_app_dev/home/home_pages/search_orgs/org_public_profile.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enrole_app_dev/main.dart';
-import 'package:after_init/after_init.dart';
 
 class SearchByIDPage extends StatefulWidget {
   @override
@@ -28,8 +27,8 @@ class _SearchByIDPageState extends State<SearchByIDPage>{
     // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero, () async {
-      if(Provider.of<CurrentPage>(context, listen: false).tag != 'searchByID'){
-          Provider.of<CurrentPage>(context, listen: false).tag = 'searchByID';
+      if(context.read(currentPageProvider).tag != 'searchByID'){
+          context.read(currentPageProvider).tag = 'searchByID';
         }
     });
   }
@@ -60,7 +59,7 @@ class _SearchByIDPageState extends State<SearchByIDPage>{
           ElevatedButton(
             child: Text('Search'),
             onPressed: () async {
-              print(Provider.of<CurrentPage>(context, listen: false).tag = 'searchByID');
+              print(context.read(currentPageProvider).tag);
               DocumentSnapshot orgDoc = await _firestore.collection('orgs').doc(_searchQuery).get();
               if(orgDoc.exists){
                 setState(() {

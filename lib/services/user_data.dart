@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+
+
 
 class UserDatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -81,7 +84,7 @@ class UserData {
   factory UserData.fromFirestore(DocumentSnapshot document) {
     Map data = document.data() ?? {};
     return UserData(
-      school: data['school'],
+      school: data['school'] ?? 'Error loading school',
     );
   }
 }

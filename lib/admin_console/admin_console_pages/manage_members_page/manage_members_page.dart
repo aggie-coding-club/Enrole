@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:enrole_app_dev/main.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
-import 'package:after_init/after_init.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
 import 'manage_join_requests.dart';
 import 'package:enrole_app_dev/builders/hero_dialog_route.dart';
 
@@ -14,18 +12,19 @@ class ManageMembersPage extends StatefulWidget {
   _ManageMembersPageState createState() => _ManageMembersPageState();
 }
 
-class _ManageMembersPageState extends State<ManageMembersPage>
-    with AfterInitMixin {
+class _ManageMembersPageState extends State<ManageMembersPage> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<List<Widget>> memberData;
 
   Future<QuerySnapshot> _joinRequestDocs;
 
-  Future<QuerySnapshot> joinRequestDocs(BuildContext context) async {
+  String _orgID;
+
+  Future<QuerySnapshot> joinRequestDocs(BuildContext context, String _orgID) async {
     return await _firestore
         .collection('orgs')
-        .doc(Provider.of<CurrentOrg>(context).getOrgID())
+        .doc(_orgID)
         .collection('join-requests')
         .get();
   }
@@ -34,74 +33,85 @@ class _ManageMembersPageState extends State<ManageMembersPage>
   void initState() {
     // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+_orgID = context.read(currentOrgProvider).getOrgID();
+    memberData = getMemberTiles(context, _orgID);
+    _joinRequestDocs = joinRequestDocs(context, _orgID);
+
+
+});
   }
 
   @override
   void didInitState() {
     // TODO: implement didInitState
-    memberData = getMemberTiles(context);
-    _joinRequestDocs = joinRequestDocs(context);
+    
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        FutureBuilder(
-            future: _joinRequestDocs,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                QuerySnapshot querySnapshot = snapshot.data;
-                return joinRequests(querySnapshot, context);
-              } else {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(onPressed: null, child: Text('Loading...'))
-                  ],
-                );
-              }
-            }),
-        Expanded(
-          child: FutureBuilder(
-              future: memberData,
-              builder: (con, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasData) {
-                    List<Widget> tiles = snapshot.data;
-                    return GridView.count(
-                      primary: false,
-                      crossAxisCount: 2,
-                      children: tiles,
-                    );
+    return Consumer(
+      builder: (context, watch, child) {
+        final String _orgID = watch(currentOrgProvider).getOrgID();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            FutureBuilder(
+                future: _joinRequestDocs,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    QuerySnapshot querySnapshot = snapshot.data;
+                    return joinRequests(querySnapshot, context);
                   } else {
-                    return Text('Something went wrong');
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(onPressed: null, child: Text('Loading...'))
+                      ],
+                    );
                   }
-                } else {
-                  return Column(children: [
-                    Container(
-                      child: CircularProgressIndicator(),
-                      width: 50.0,
-                      height: 50.0,
-                    ),
-                  ]);
-                }
-              }),
-        ),
-      ],
+                }),
+            Expanded(
+              child: FutureBuilder(
+                  future: memberData,
+                  builder: (con, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasData) {
+                        List<Widget> tiles = snapshot.data;
+                        return GridView.count(
+                          primary: false,
+                          crossAxisCount: 2,
+                          children: tiles,
+                        );
+                      } else {
+                        return Text('Something went wrong');
+                      }
+                    } else {
+                      return Column(children: [
+                        Container(
+                          child: CircularProgressIndicator(),
+                          width: 50.0,
+                          height: 50.0,
+                        ),
+                      ]);
+                    }
+                  }),
+            ),
+          ],
+        );
+      }
     );
   }
 }
 
-Future<List<Widget>> getMemberTiles(BuildContext context) async {
+Future<List<Widget>> getMemberTiles(BuildContext context, String orgID) async {
   print('Started member query');
 
   HttpsCallable _getOrgMembers =
       FirebaseFunctions.instance.httpsCallable('getOrgMembers');
 
   final membersList = await _getOrgMembers.call(<String, dynamic>{
-    'orgID': Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
+    'orgID': orgID,
   });
 
   print('Called cloud function');
@@ -144,7 +154,7 @@ Future<List<Widget>> getMemberTiles(BuildContext context) async {
               Navigator.push(
                   context,
                   HeroDialogRoute(
-                      builder: (context) => AdminProfilePopupCard(members[index])));
+                      builder: (context) => AdminProfilePopupCard(members[index], orgID)));
             },
             child: Container(
               height: 100.0,
@@ -173,7 +183,9 @@ class AdminProfilePopupCard extends StatefulWidget {
 
   final Map<dynamic, dynamic> memberProfile;
 
-  AdminProfilePopupCard(this.memberProfile);
+  final String orgID;
+
+  AdminProfilePopupCard(this.memberProfile, this.orgID);
 
   @override
   _AdminProfilePopupCardState createState() => _AdminProfilePopupCardState();
@@ -260,7 +272,7 @@ class _AdminProfilePopupCardState extends State<AdminProfilePopupCard> {
                               HttpsCallable _changeUserRole = FirebaseFunctions.instance.httpsCallable('changeUserRole');
                               _changeUserRole.call({
                                 'userID': this.widget.memberProfile['userID'],
-                                'orgID': Provider.of<CurrentOrg>(context, listen: false).getOrgID(),
+                                'orgID': this.widget.orgID,
                                 'newUserRole': _dropdownValue,
                               });
                               Navigator.pop(context);

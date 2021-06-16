@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enrole_app_dev/main.dart';
 
 class ManageOrgPages extends StatefulWidget {
@@ -17,7 +17,7 @@ class _ManageOrgPagesState extends State<ManageOrgPages> {
     try {
       QuerySnapshot query = await _firestore
           .collection('orgs')
-          .doc(Provider.of<CurrentOrg>(context, listen: false).getOrgID())
+          .doc(context.read(currentOrgProvider).getOrgID())
           .collection('pages')
           .get();
 
@@ -85,7 +85,7 @@ class _PageTileState extends State<PageTile> {
     try {
       await _firestore
           .collection('orgs')
-          .doc(Provider.of<CurrentOrg>(context, listen: false).getOrgID())
+          .doc(context.read(currentOrgProvider).getOrgID())
           .collection('pages')
           .doc(page)
           .get()
@@ -93,7 +93,7 @@ class _PageTileState extends State<PageTile> {
         if (!document.exists) {
           await _firestore
               .collection('orgs')
-              .doc(Provider.of<CurrentOrg>(context, listen: false).getOrgID())
+              .doc(context.read(currentOrgProvider).getOrgID())
               .collection('pages')
               .doc(page)
               .set({
@@ -110,7 +110,7 @@ class _PageTileState extends State<PageTile> {
     try {
       await _firestore
           .collection('orgs')
-          .doc(Provider.of<CurrentOrg>(context, listen: false).getOrgID())
+          .doc(context.read(currentOrgProvider).getOrgID())
           .collection('pages')
           .doc(page)
           .get()
@@ -118,7 +118,7 @@ class _PageTileState extends State<PageTile> {
         if (document.exists) {
           await _firestore
               .collection('orgs')
-              .doc(Provider.of<CurrentOrg>(context, listen: false).getOrgID())
+              .doc(context.read(currentOrgProvider).getOrgID())
               .collection('pages')
               .doc(page)
               .delete();
@@ -134,7 +134,7 @@ class _PageTileState extends State<PageTile> {
     return StreamBuilder(
         stream: _firestore
             .collection('orgs')
-            .doc(Provider.of<CurrentOrg>(context).getOrgID())
+            .doc(context.read(currentOrgProvider).getOrgID())
             .collection('pages')
             .doc(this.widget.page)
             .snapshots(),

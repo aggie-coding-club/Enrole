@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:enrole_app_dev/main.dart';
 import 'package:enrole_app_dev/home/home.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'admin_console_pages/analytics_page/analytics_page.dart';
 import 'admin_console_pages/manage_members_page/manage_members_page.dart';
 import 'admin_console_pages/org_settings_page/org_settings_page.dart';
@@ -20,10 +20,9 @@ class _AdminConsoleState extends State<AdminConsole> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<CurrentAdminPage, CurrentOrg>(
-          builder: (_, currentAdminPage, currentOrg, __) => Scaffold(
+    return Scaffold(
         appBar: AppBar(
-          title: Text(Provider.of<CurrentOrg>(context).getOrgName()),
+          title: Text(context.read(currentOrgProvider).getOrgID()),
           leading: IconButton(
             icon: Icon(Icons.clear),
             onPressed: (){
@@ -47,16 +46,16 @@ class _AdminConsoleState extends State<AdminConsole> {
               });
               switch (index){
                 case 0:
-                  Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = ManageMembersPage();
+                  context.read(currentAdminPageProvider).pageWidget = ManageMembersPage();
                 break;
                 case 1:
-                  Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = AnalyticsPage();
+                  context.read(currentAdminPageProvider).pageWidget = AnalyticsPage();
                 break;
                 case 2:
-                  Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = OrgNotificationsPage();
+                  context.read(currentAdminPageProvider).pageWidget = OrgNotificationsPage();
                 break;
                 case 3:
-                  Provider.of<CurrentAdminPage>(context, listen: false).pageWidget = OrgSettingsPage();
+                  context.read(currentAdminPageProvider).pageWidget = OrgSettingsPage();
                 break;
               }
             },
@@ -79,8 +78,7 @@ class _AdminConsoleState extends State<AdminConsole> {
               ),
             ],
           ),
-        body: currentAdminPage.pageWidget,
-      ),
-    );
+        body: context.read(currentAdminPageProvider).pageWidget,
+      );
   }
 }

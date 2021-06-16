@@ -1,11 +1,15 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:enrole_app_dev/home/home.dart';
 import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'login/login_screen.dart';
 import 'register_user/register_user_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -38,20 +42,8 @@ class InitApp extends StatelessWidget {
             textDirection: TextDirection.ltr,
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
-
           FirebaseAuth _auth = FirebaseAuth.instance;
-
-          return MultiProvider(
-            child: MyApp(),
-            providers: [
-              StreamProvider<User>(create: (_) => FirebaseAuth.instance.userChanges(), initialData: null, lazy: false,),
-              StreamProvider<UserData>(create: (_) => UserDatabaseService().streamUser(_auth.currentUser.uid), initialData: null,),
-              StreamProvider<List<JoinedOrg>>(create: (_)=> UserDatabaseService().streamJoinedOrgs(_auth.currentUser.uid), initialData: [],),
-              ChangeNotifierProvider<CurrentPage>(create: (_) => CurrentPage(),),
-              ChangeNotifierProvider<CurrentOrg>(create: (_) => CurrentOrg(),),
-              ChangeNotifierProvider<CurrentAdminPage>(create: (_) => CurrentAdminPage(),),
-            ],
-          );
+          return MyApp();
         } else {
           // TODO: Create a splash screen
           return Text(
@@ -70,71 +62,155 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        canvasColor: Colors.white,
-        primarySwatch: Colors.blue,
-        primaryColor: Colors.blue[700],
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        appBarTheme: AppBarTheme(
-          iconTheme: IconThemeData(
-            color: Colors.blue[700],
+    return ProviderScope(
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          canvasColor: Colors.white,
+          primarySwatch: Colors.blue,
+          primaryColor: Colors.blue[700],
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          appBarTheme: AppBarTheme(
+            iconTheme: IconThemeData(
+              color: Colors.blue[700],
+            ),
           ),
         ),
+        initialRoute: _auth.currentUser == null ? '/login' : '/home',
+        routes: {
+          '/login': (context) => LoginScreen(),
+          '/register-user': (context) => RegisterUserPage(),
+          '/home': (context) => Home(),
+          '/admin-console': (context) => AdminConsole(),
+          '/user-settings': (context) => UserSettingsScaffold(),
+        },
+        navigatorObservers: [
+          FirebaseAnalyticsObserver(analytics: Global.analytics),
+        ],
       ),
-      initialRoute: _auth.currentUser == null ? '/login' : '/home',
-      routes: {
-        '/login': (context) => LoginScreen(),
-        '/register-user': (context) => RegisterUserPage(),
-        '/home': (context) =>Home(),
-        '/admin-console': (context) => AdminConsole(),
-        '/user-settings': (context) => UserSettingsScaffold(),
-      },
-      navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: Global.analytics),
-      ],
     );
   }
 }
 
+final firebaseAuthProvider =
+    Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
 
-class CurrentOrg with ChangeNotifier{
+final userProvider = StreamProvider<User>((ref) {
+  // final stream = FirebaseAuth.instance.authStateChanges();
+
+  // final streamController = StreamController<User>();
+
+  // streamController.addStream(stream);
+
+  ref.onDispose(() {
+    // streamController.close();
+  });
+
+  // final watchAuth = ref.watch(firebaseAuthProvider);
+
+  return ref.watch(firebaseAuthProvider).userChanges();
+});
+
+final joinedOrgsProvider = StreamProvider<List<JoinedOrg>>((ref) {
+  final currentUser = ref.watch(userProvider);
+
+  final streamController = StreamController<List<JoinedOrg>>();
+
+  currentUser.whenData((value) {
+    final stream =
+        UserDatabaseService().streamJoinedOrgs(currentUser.data.value.uid);
+    streamController.addStream(stream);
+  });
+
+  ref.onDispose(() {
+    // streamController.close();
+  });
+
+  return streamController.stream;
+});
+
+final currentOrgProvider = ChangeNotifierProvider<CurrentOrg>((ref) {
+  final _joinedOrgs = ref.watch(joinedOrgsProvider);
+
+  CurrentOrg returnOrg = CurrentOrg();
+
+  print('Building currentOrgProvider');
+  _joinedOrgs.whenData((value) {
+    print('Joined orgs: ${value.toString()}');
+    returnOrg.initOrg(value[0]);
+  });
+
+  print('Returning base CurrentOrg()');
+  return returnOrg;
+});
+
+final currentPageProvider =
+    ChangeNotifierProvider<CurrentPage>((ref) => CurrentPage());
+
+final currentAdminPageProvider =
+    ChangeNotifierProvider<CurrentAdminPage>((ref) => CurrentAdminPage());
+
+final userDataProvider = StreamProvider<UserData>((ref) {
+  final currentUser = ref.watch(userProvider);
+
+  final streamController = StreamController<UserData>();
+
+  currentUser.whenData((value) {
+    final stream = UserDatabaseService().streamUser(currentUser.data.value.uid);
+
+    streamController.addStream(stream);
+  });
+
+  ref.onDispose(() {
+    // streamController.close();
+  });
+
+  return streamController.stream;
+});
+
+class CurrentOrg with ChangeNotifier {
   JoinedOrg _org;
 
   get org => _org;
 
-  set org(JoinedOrg org){
+  set org(JoinedOrg org) {
     _org = org;
     notifyListeners();
   }
 
-  String getOrgURL (){
-    if (_org != null){
+  void initOrg(JoinedOrg org) {
+    if (_org == null) {
+      _org = org;
+    }
+    notifyListeners();
+  }
+
+  String getOrgURL() {
+    if (_org != null) {
       return _org.orgImageURL;
     } else {
       return "https://cdn4.iconfinder.com/data/icons/web-and-mobile-ui/24/UI-33-512.png";
     }
   }
 
-  String getUserRole(){
-    if (_org != null){
+  String getUserRole() {
+    if (_org != null) {
       return _org.userRole;
     } else {
       return "member";
     }
   }
 
-  String getOrgID(){
-    if (_org != null){
+  String getOrgID() {
+    if (_org != null) {
       return _org.orgID;
     } else {
       return "Error";
     }
   }
 
-  String getOrgName(){
-    if (_org != null){
+  String getOrgName() {
+    if (_org != null) {
       return _org.orgName;
     } else {
       return "Error";
@@ -153,17 +229,17 @@ class CurrentPage with ChangeNotifier {
 
   get tag => _tag;
 
-  set pageWidget(Widget widget){
+  set pageWidget(Widget widget) {
     _pageWidget = widget;
     notifyListeners();
   }
 
-  set pageTitle(String title){
+  set pageTitle(String title) {
     _pageTitle = title;
     notifyListeners();
   }
 
-  set tag(String tag){
+  set tag(String tag) {
     _tag = tag;
     notifyListeners();
   }
@@ -177,12 +253,12 @@ class CurrentAdminPage with ChangeNotifier {
 
   get pageTitle => _pageTitle;
 
-  set pageWidget(Widget widget){
+  set pageWidget(Widget widget) {
     _pageWidget = widget;
     notifyListeners();
   }
 
-  set pageTitle(String title){
+  set pageTitle(String title) {
     _pageTitle = title;
     notifyListeners();
   }
@@ -190,17 +266,17 @@ class CurrentAdminPage with ChangeNotifier {
 
 class CurrentUser with ChangeNotifier {
   FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   User _user;
 
   get user => _user;
 
-  set user (User user){
+  set user(User user) {
     _user = user;
     notifyListeners();
   }
 
-  Stream<User> userStream(){
+  Stream<User> userStream() {
     return _auth.userChanges();
   }
 }

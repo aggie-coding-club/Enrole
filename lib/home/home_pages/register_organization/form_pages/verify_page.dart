@@ -5,10 +5,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 import 'package:enrole_app_dev/home/home_pages/overview.dart';
 import 'dart:io';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enrole_app_dev/main.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:after_init/after_init.dart';
 
 class VerifyPage extends StatefulWidget {
   final Function homeCallback;
@@ -32,7 +31,7 @@ class VerifyPage extends StatefulWidget {
   _VerifyPageState createState() => _VerifyPageState();
 }
 
-class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
+class _VerifyPageState extends State<VerifyPage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -153,7 +152,7 @@ class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
           'time': DateTime.now().toString(),
         });
         print('Invoked callable');
-        var currentPage = Provider.of<CurrentPage>(context, listen: false);
+        final currentPage = context.read(currentPageProvider);
         currentPage.pageWidget = Overview();
         currentPage.pageTitle = 'Overview';
       }
@@ -168,12 +167,6 @@ class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
   }
 
   @override
-  void didInitState() {
-    // TODO: implement didInitState
-    _user = Provider.of<User>(context);
-  }
-
-  @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
@@ -184,7 +177,7 @@ class _VerifyPageState extends State<VerifyPage> with AfterInitMixin {
 
   @override
   Widget build(BuildContext context) {
-    _user = Provider.of<User>(context);
+    // _user = Provider.of<User>(context);
 
     bool isNameDone =
         this.widget.orgName != null && this.widget.orgName.length >= 3;
