@@ -8,11 +8,11 @@ import 'package:enrole_app_dev/main.dart';
 
 class OrgPublicProfile extends StatefulWidget {
 
-  final AlgoliaObjectSnapshot orgData;
+  final AlgoliaObjectSnapshot? orgData;
 
-  final ImageProvider image;
+  final ImageProvider? image;
 
-  final BuildContext context;
+  final BuildContext? context;
 
   OrgPublicProfile({this.orgData, this.image, this.context});
 
@@ -32,36 +32,46 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
     Color cardColor;
     Color textColor;
 
-    List<JoinedOrg> joinedOrgs = watch(joinedOrgsProvider).data.value ?? [];
+    List<JoinedOrg> joinedOrgs = watch(joinedOrgsProvider).data?.value ?? [];
     List<String> orgIDs = List.generate(joinedOrgs.length, (index) {
-      return joinedOrgs[index].orgID;
+      if(joinedOrgs[index].orgID == null){
+        return '';
+      } else {
+        return joinedOrgs[index].orgID!;
+      }
+      
     });
 
     switch(orgType){
       case 'public':{
         titleString = 'Join';
 //          subString = 'Press here to join';
-        cardColor = Colors.lightGreen[200];
-        textColor = Colors.green[800];
+        cardColor = Colors.lightGreen[200]!;
+        textColor = Colors.green[800]!;
       } break;
       case 'private':{
         titleString = 'Send join request';
 //          subString = 'Press here to request admission';
-        cardColor = Colors.lightBlue[200];
-        textColor = Colors.blue[800];
+        cardColor = Colors.lightBlue[200]!;
+        textColor = Colors.blue[800]!;
       } break;
       case 'application':{
         titleString = 'Fill out application';
 //          subString = 'Press here to fill out application';
-        cardColor = Colors.yellow[100];
-        textColor = Colors.yellow[700];
-      } break;
+        cardColor = Colors.yellow[100]!;
+        textColor = Colors.yellow[700]!;
+      } break; 
+      default: 
+      titleString = 'An error occurred';
+      cardColor = Colors.grey;
+      textColor = Colors.black;
+      ;
     }
 
     if(orgIDs.contains(orgID)){
       titleString = 'Leave';
-      cardColor = Colors.red[200];
-      textColor = Colors.red[800];
+      cardColor = Colors.red[200]!;
+      textColor = Colors.red[800]!;
     }
 
     return GestureDetector(
@@ -76,13 +86,15 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                   onPressed: () async {
                     Navigator.pop(context);
                   String date = DateTime.now().toString();
+                    if(this.widget.orgData != null)
                     try {
+                      AlgoliaObjectSnapshot orgData = this.widget.orgData!;
                       final user = _auth.currentUser;
                       await _joinRequest.call(<String, dynamic>{
                         'orgType': orgType,
-                        'orgID': this.widget.orgData.data['orgID'],
-                        'orgName': this.widget.orgData.data['orgName'],
-                        'userID': user.uid,
+                        'orgID': orgData.data['orgID'],
+                        'orgName': orgData.data['orgName'],
+                        'userID': user!.uid,
                         'userName': 'Jesse Phipps',
                         'date': date,
                       });
@@ -175,7 +187,7 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                           child: Container(
                             height: 40.0,
                             width: 40.0,
-                            color: Colors.grey[700].withOpacity(0.6),
+                            color: Colors.grey[700]!.withOpacity(0.6),
                           ),
                         ),
                         Positioned(
@@ -192,7 +204,7 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10.0),
                                   image: DecorationImage(
-                                    image: this.widget.image,
+                                    image: this.widget.image!,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -206,7 +218,7 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                                     Container(
                                       padding: EdgeInsets.all(8.0),
                                       child: Text(
-                                        this.widget.orgData.data['orgName'],
+                                        this.widget.orgData!.data['orgName'],
                                         maxLines: 2,
                                         style: TextStyle(
                                           color: Colors.white,
@@ -223,7 +235,7 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                         ),
                       ],
                     ),
-                    background: Image(image: this.widget.image, fit: BoxFit.cover,),
+                    background: Image(image: this.widget.image!, fit: BoxFit.cover,),
                   ),
                 ),
                 SliverList(
@@ -262,7 +274,7 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                         padding: EdgeInsets.fromLTRB(14.0, 8.0, 14.0, 8.0),
                         child: Consumer(
                           builder: (context, watch, child) {
-                            return joinTile(this.widget.orgData.data['orgType'], this.widget.orgData.data['orgID'], watch);
+                            return joinTile(this.widget.orgData!.data['orgType'], this.widget.orgData!.data['orgID'], watch);
                           }
                         ),
                       ),
@@ -281,14 +293,14 @@ class _OrgPublicProfileState extends State<OrgPublicProfile> {
                       Container(
                         padding: EdgeInsets.fromLTRB(14.0, 8.0, 14.0, 8.0),
                         child: Text(
-                          this.widget.orgData.data['bio'],
+                          this.widget.orgData!.data['bio'],
                           style: textStyle,
                         ),
                       ),
                       Container(
                         margin: EdgeInsets.all(8.0),
                         child: Wrap(
-                          children: tagTileBuilder(this.widget.orgData.data['tags']),
+                          children: tagTileBuilder(this.widget.orgData!.data['tags']),
                         ),
                       ),
                       Padding(

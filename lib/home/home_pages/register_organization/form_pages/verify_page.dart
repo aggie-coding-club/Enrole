@@ -10,14 +10,14 @@ import 'package:enrole_app_dev/main.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class VerifyPage extends StatefulWidget {
-  final Function homeCallback;
+  final Function? homeCallback;
 
-  final String orgName;
-  final String orgType;
-  final String school;
-  final File imageFile;
-  final String bio;
-  final List<String> tags;
+  final String? orgName;
+  final String? orgType;
+  final String? school;
+  final File? imageFile;
+  final String? bio;
+  final List<String>? tags;
 
   VerifyPage(
       {this.homeCallback,
@@ -40,18 +40,19 @@ class _VerifyPageState extends State<VerifyPage> {
 
   var uuid = Uuid();
 
-  Future<Widget> emailVerifiedWidget;
+  Future<Widget?>? emailVerifiedWidget;
 
   bool isEmailVerifiedVar = false;
 
   bool publishing = false;
 
-  User _user;
+  User? _user;
 
-  Future<Widget> isEmailVerified(BuildContext context) async {
+  Future<Widget?> isEmailVerified(BuildContext context) async {
     _user = _auth.currentUser;
+    if(_user != null)
     try {
-      if (_user.emailVerified) {
+      if (_user!.emailVerified) {
         setState(() {
           isEmailVerifiedVar = true;
         });
@@ -96,7 +97,8 @@ class _VerifyPageState extends State<VerifyPage> {
                 onPressed: () {
                   print('test ${this.widget.school}');
                   setState(() async {
-                    User initUser = _auth.currentUser;
+                    User? initUser = _auth.currentUser;
+                    if(initUser != null)
                     await initUser.reload();
                     emailVerifiedWidget = isEmailVerified(context);
                   });
@@ -105,7 +107,7 @@ class _VerifyPageState extends State<VerifyPage> {
               ElevatedButton(
                 child: Text('Verify'),
                 onPressed: () {
-                  _user.sendEmailVerification();
+                  _user!.sendEmailVerification();
                 },
               ),
             ],
@@ -118,12 +120,12 @@ class _VerifyPageState extends State<VerifyPage> {
   }
 
   void publishOrgToFirestore(
-      {String orgName,
-      String orgType,
-      String school,
-      File image,
-      String bio,
-      List<String> tags}) async {
+      {String? orgName,
+      String? orgType,
+      String? school,
+      File? image,
+      String? bio,
+      List<String>? tags}) async {
     try {
       print('Creating org...');
       HttpsCallable createOrg =
@@ -132,7 +134,7 @@ class _VerifyPageState extends State<VerifyPage> {
       //TODO: Make sure created organization can't override an existing one
       String orgID = uuid.v4().substring(0, 4);
       final user = _auth.currentUser;
-      if (user != null) {
+      if (user != null && image != null) {
         await _storage.ref().child('orgs/$orgID/profileImage').putFile(image);
         final profileImage = await _storage
             .ref()
@@ -180,13 +182,13 @@ class _VerifyPageState extends State<VerifyPage> {
     // _user = Provider.of<User>(context);
 
     bool isNameDone =
-        this.widget.orgName != null && this.widget.orgName.length >= 3;
+        this.widget.orgName != null && this.widget.orgName!.length >= 3;
     bool isTypeDone = this.widget.orgType != null;
     bool isSchoolDone = this.widget.school != null;
 
     bool isImageDone = this.widget.imageFile != null;
     bool isBioDone = this.widget.bio != null;
-    bool isTagsDone = this.widget.tags.isNotEmpty;
+    bool isTagsDone = this.widget.tags!.isNotEmpty;
 
     List<bool> generalInfoComplete = [isNameDone, isTypeDone, isSchoolDone];
     List<bool> profileInfoComplete = [isImageDone, isBioDone, isTagsDone];
@@ -223,9 +225,9 @@ class _VerifyPageState extends State<VerifyPage> {
                 FutureBuilder(
                   future: emailVerifiedWidget,
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
                       return snapshot.data != null
-                          ? snapshot.data
+                          ? snapshot.data as Widget
                           : Container(
                               margin: EdgeInsets.all(12.0),
                               child: Text('Something went wrong'));

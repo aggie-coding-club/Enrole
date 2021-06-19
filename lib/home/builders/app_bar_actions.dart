@@ -30,21 +30,21 @@ class orgEndDrawer extends ConsumerWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5.0),
                     image: DecorationImage(
-                      image: NetworkImage(orgList[index].orgImageURL),
+                      image: orgList[index].orgImageURL == null ? NetworkImage('https://www.computerhope.com/jargon/e/error.png') : NetworkImage(orgList[index].orgImageURL!),
                       fit: BoxFit.cover,
                     ),
                   ),
                   height: 50.0,
                   width: 50.0,
                 ),
-                title: Text(orgList[index].orgName),
+                title: orgList[index].orgName == null ? Text('An error occurred') : Text(orgList[index].orgName!),
                 subtitle: Text(
-                    "${orgList[index].userRole[0].toUpperCase()}${orgList[index].userRole.substring(1)}"),
+                    "${orgList[index].userRole![0].toUpperCase()}${orgList[index].userRole!.substring(1)}"),
                 onTap: () {
                   context.read(currentOrgProvider).org = orgList[index];
                   final currentPage = context.read(currentPageProvider);
                   currentPage.pageWidget = Overview();
-                  currentPage.pageTitle = orgList[index].orgName;
+                  currentPage.pageTitle = orgList[index].orgName!;
                   Navigator.pop(context);
                 },
               ),

@@ -14,9 +14,6 @@ class AdminFloatingActionButton extends StatefulWidget {
 
 class _AdminFloatingActionButtonState extends State<AdminFloatingActionButton> {
 
-  JoinedOrg _currentOrg;
-
-  FirebaseAuth _auth = FirebaseAuth.instance;
   
   @override
   Widget build(BuildContext context) {

@@ -18,21 +18,21 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
   FirebaseFirestore _firestore =
       FirebaseFirestore.instance; // Creates Firestore instance for data
 
-  String _email;
-  String _password1;
-  String _password2;
+  String _email = '';
+  String _password1 = '';
+  String _password2 = '';
 
   RegExp exp = RegExp(r"(\w+\.edu)");
 
-  Iterable<RegExpMatch> domain;
+  Iterable<RegExpMatch>? domain;
 
-  Widget matchedSchool;
+  Widget? matchedSchool;
 
-  Future<String> matchingSchoolName;
+  Future<String?>? matchingSchoolName;
 
   final _formKey = GlobalKey<FormState>();
 
-  Icon _passwordsMatchIcon;
+  Icon? _passwordsMatchIcon;
 
   void searchForMatchingSchools() {}
 
@@ -50,7 +50,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
 
   void signupUser() async {
     print("Signing up user");
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState!.validate()) {
       try {
         await _auth.createUserWithEmailAndPassword(
             email: _email, password: _password2);
@@ -97,6 +97,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                         if (domain.length == 1) {
                           print('Search Initiated');
                           matchingSchoolName = matchDomainToSchool(_email);
+                          if (matchingSchoolName != null)
                           matchedSchool = matchedSchoolText(matchingSchoolName);
                         } else if (domain.length == 0) {
                           matchedSchool = null;
@@ -106,7 +107,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                     },
                     validator: (value) {
                       print("Signup With Email: $matchingSchoolName");
-                      Iterable<RegExpMatch> domain = exp.allMatches(value);
+                      Iterable<RegExpMatch> domain = exp.allMatches(value!);
                       if (value.isEmpty) {
                         return 'Please input text';
                       }
@@ -128,7 +129,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                       });
                     },
                     validator: (value) {
-                      if (value.isEmpty) {
+                      if (value!.isEmpty) {
                         return 'Please input text';
                       }
                       if (value.length <= 6) {
@@ -152,7 +153,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                       });
                     },
                     validator: (value) {
-                      if (value.isEmpty) {
+                      if (value!.isEmpty) {
                         return 'Please input text';
                       }
                       if (value.length <= 6) {
@@ -164,7 +165,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                 ),
                 Text('School match:'),
                 matchedSchool != null
-                    ? matchedSchool
+                    ? matchedSchool!
                     : Text('No Universities match that domain'),
                 SizedBox(
                   height: 12.0,
@@ -180,12 +181,12 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
   }
 }
 
-Widget matchedSchoolText(Future<String> matchingSchoolName) {
+Widget matchedSchoolText(Future<String?>? matchingSchoolName) {
   return FutureBuilder(
     future: matchingSchoolName,
     builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.done) {
-        String school = snapshot.data;
+      if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
+        String school = snapshot.data as String;
         print('Data: ${snapshot.data}');
         if (school != null) {
           return Text("Matched School:  $school");

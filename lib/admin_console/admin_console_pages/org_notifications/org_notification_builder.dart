@@ -4,7 +4,7 @@ import 'package:enrole_app_dev/main.dart';
 import 'package:enrole_app_dev/admin_console/admin_console_pages/manage_members_page/manage_join_requests.dart';
 
 class OrgNotificationBuilder extends StatefulWidget {
-  final Map<String, dynamic> notificationData;
+  final Map<String, dynamic>? notificationData;
 
   OrgNotificationBuilder({this.notificationData});
 
@@ -15,20 +15,20 @@ class OrgNotificationBuilder extends StatefulWidget {
 class _OrgNotificationBuilderState extends State<OrgNotificationBuilder> {
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> notificationData = this.widget.notificationData;
+    Map<String, dynamic> notificationData = this.widget.notificationData ?? {};
     switch (notificationData['type']) {
       case 'userJoin':
         return userJoinNotification(notificationData);
-        break;
+
       case 'userJoinRequest':
         return userJoinRequestNotification(notificationData, context);
-        break;
+
       case 'roleChange':
         return roleChangeNotification(notificationData, context);
-        break;
+
       default:
         return errorNotification();
-        break;
+
     }
   }
 }

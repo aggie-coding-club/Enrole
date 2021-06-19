@@ -8,16 +8,16 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class OrgProfileFormPage extends StatefulWidget {
 
-  final File image;
-  final List<String> tags;
-  final String bio;
+  final File? image;
+  final List<String>? tags;
+  final String? bio;
 
-  final Function hidePageControllers;
-  final Function showPageControllers;
+  final Function? hidePageControllers;
+  final Function? showPageControllers;
 
-  final Function setImage;
-  final Function setTags;
-  final Function setBio;
+  final Function? setImage;
+  final Function? setTags;
+  final Function? setBio;
   OrgProfileFormPage({this.setImage, this.setTags, this.setBio, this.image, this.tags, this.bio, this.hidePageControllers, this.showPageControllers});
 
   @override
@@ -34,12 +34,12 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
 
   final _storage = FirebaseStorage.instance;
 
-  String tagText;
+  String? tagText;
   String tagTextHint = '';
   List<String> tags = [];
   String bio = '';
 
-  File _image;
+  File? _image;
 
   ImageProvider<dynamic> orgProfilePic = AssetImage('assets/group_default_pic.jpg');
 
@@ -55,16 +55,18 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
     else if(status.isGranted){
       final pickedFile = await _picker.getImage(source: ImageSource.gallery);
       print('posted image');
-      this.widget.setImage(File(pickedFile.path));
+      if (pickedFile != null){
+        this.widget.setImage!(File(pickedFile.path));
       setState(() {
         _image = File(pickedFile.path);
       });
+      }
     }
   }
   @override
   void initState() {
     super.initState();
-    bioController.text = this.widget.bio != null ? this.widget.bio : '';
+    bioController.text = this.widget.bio != null ? this.widget.bio as String : '';
   }
 
   @override
@@ -77,7 +79,8 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
       fontWeight: FontWeight.bold,
     );
 
-    tags = this.widget.tags;
+    if(this.widget.tags != null)
+    tags = this.widget.tags as List<String>;
 
     return ListView(
       physics: BouncingScrollPhysics(),
@@ -103,12 +106,12 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
                       margin: EdgeInsets.all(8.0),
                       child: CircleAvatar(
                         radius: 75.0,
-                        backgroundImage: this.widget.image == null ? null : Image.file(this.widget.image).image,
+                        backgroundImage: this.widget.image == null ? null : Image.file(this.widget.image as File).image,
                       ),
                     ),
                     Container(
                       margin: EdgeInsets.all(12.0),
-                      child: RaisedButton(
+                      child: ElevatedButton(
                         onPressed: (){
                           getImageFromGallery();
                         },
@@ -144,13 +147,13 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
                       fontWeight: FontWeight.bold,
                     ),
                     onTap: (){
-                      this.widget.hidePageControllers();
+                      this.widget.hidePageControllers!();
                     },
                     onChanged: (value){
-                      this.widget.setBio(value);
+                      this.widget.setBio!(value);
                     },
                     onSubmitted: (value){
-                      this.widget.showPageControllers();
+                      this.widget.showPageControllers!();
                     },
                   ),
                 ),
@@ -175,7 +178,7 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
                           fontWeight: FontWeight.bold,
                         ),
                         onTap: (){
-                          this.widget.hidePageControllers();
+                          this.widget.hidePageControllers!();
                         },
                         onChanged: (value){
                           setState(() {
@@ -187,20 +190,20 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
                           setState(() {
                             if(tags.contains(tagText)){
                               tagTextHint = 'You already added this tag';
-                            } else if(tagText.length < 3){
+                            } else if(tagText!.length < 3){
                               tagTextHint = 'Minimum tag length is 3';
                             } else if(tags.length > 4){
                               tagTextHint = 'Maximum number of categories is 5';
-                            } else if(tagText.length > 20){
+                            } else if(tagText!.length > 20){
                               tagTextHint = 'Maximum tag name length is 20';
                             } else{
                               tagTextHint = '';
-                              tags = [...tags, tagText];
-                              this.widget.setTags(tags);
+                              tags = [...tags, tagText as String];
+                              this.widget.setTags!(tags);
                               tagController.clear();
                             }
                           });
-                          this.widget.showPageControllers();
+                          this.widget.showPageControllers!();
                         },
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -230,12 +233,12 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
                           ),
                           child: ListView.builder(
                             physics: BouncingScrollPhysics(),
-                            itemCount: this.widget.tags.length,
+                            itemCount: this.widget.tags!.length,
                             itemBuilder: (context, index){
                               return Card(
                                 child: ListTile(
                                   title: Text(
-                                    this.widget.tags[index],
+                                    this.widget.tags![index],
                                     style: TextStyle(
                                       color: Theme.of(context).primaryColor,
                                       fontWeight: FontWeight.bold,
@@ -247,7 +250,7 @@ class _OrgProfileFormPageState extends State<OrgProfileFormPage> {
                                       setState(() {
                                         tags.remove(tags[index]);
                                       });
-                                      this.widget.setTags(tags);
+                                      this.widget.setTags!(tags);
                                     },
                                   ),
                                 ),

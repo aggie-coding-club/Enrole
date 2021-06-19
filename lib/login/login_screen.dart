@@ -10,10 +10,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   FirebaseAuth _auth = FirebaseAuth.instance;  // Creates FirebaseAuth instance for authentication
 
-  String _email;
-  String _password;
+  String _email = '';
+  String _password = '';
 
-  void attemptLogin({String email, String password}) async {  // Logs user in if data checks out
+  void attemptLogin(String email, String password) async {  // Logs user in if data checks out
     try{
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       Navigator.pushNamed(context, '/home');  // Navigates to home page if sign in is successful
@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               GestureDetector(  // Initiates when widgets inside are tapped
                 onTap: (){
-                  attemptLogin(email: _email, password: _password);  // Attempts to log the user in
+                  attemptLogin( _email, _password);  // Attempts to log the user in
                 },
                 child: Container(
                   margin: EdgeInsets.all(30.0),

@@ -48,7 +48,7 @@ class _SearchByIDPageState extends State<SearchByIDPage>{
               });
             },
             validator: (value){
-              if(value.length != 8){
+              if(value!.length != 8){
                 return 'Please enter a valid ID';
               } else {
                 return null;
@@ -61,16 +61,18 @@ class _SearchByIDPageState extends State<SearchByIDPage>{
             onPressed: () async {
               print(context.read(currentPageProvider).tag);
               DocumentSnapshot orgDoc = await _firestore.collection('orgs').doc(_searchQuery).get();
-              if(orgDoc.exists){
+              if(orgDoc.exists && orgDoc.data() != null){
                 setState(() {
+                  Map<String, dynamic> orgDocData = orgDoc.data() as Map<String, dynamic>;
                   bodyWidget = ListTile(
-                    title: Text(orgDoc.data()['orgName']),
+                    title: Text(orgDocData['orgName']),
                     trailing: ElevatedButton(
                       child: Text('Join'),
                       onPressed: () async {
-                        if(_formKey.currentState.validate()){
+                        if(_formKey.currentState!.validate()){
+                          
                           await _joinRequest.call(<String, dynamic>{
-                        'orgID': orgDoc.data()['orgID'],
+                        'orgID': orgDocData['orgID'],
                       });
                         }
                       },

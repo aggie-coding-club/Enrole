@@ -11,7 +11,7 @@ class ManageOrgPages extends StatefulWidget {
 class _ManageOrgPagesState extends State<ManageOrgPages> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<String>> activePagesData;
+  Future<List<String>>? activePagesData;
 
   Future<List<String>> getActivePages() async {
     try {
@@ -141,10 +141,10 @@ class _PageTileState extends State<PageTile> {
         builder: (_, stream) {
           print(stream.connectionState.toString());
 
-          if (stream.connectionState == ConnectionState.active) {
+          if (stream.connectionState == ConnectionState.active && stream.data != null) {
             print('Snapshot done');
 
-            DocumentSnapshot doc = stream.data;
+            DocumentSnapshot doc = stream.data as DocumentSnapshot;
 
             bool active = false;
 

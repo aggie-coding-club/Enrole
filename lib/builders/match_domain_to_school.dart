@@ -3,7 +3,7 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-Future<String> matchDomainToSchool(String email) async {
+Future<String?> matchDomainToSchool(String email) async {
   print('Matching domain to school...');
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -13,7 +13,7 @@ Future<String> matchDomainToSchool(String email) async {
 
   print('Domain is: $domain');
 
-  QuerySnapshot results;
+  QuerySnapshot? results;
 
   await _firestore
       .collection('universities')
@@ -23,17 +23,18 @@ Future<String> matchDomainToSchool(String email) async {
     results = snapshot;
   });
 
-  print(results);
-  if (results == null) {
-    return null;
-  }
-  if (results.docs.length > 1) {
-    return null;
-  }
-  try {
-    return results.docs.first['name'];
-  } catch (e) {
-    print(e);
+  if (results != null) {
+    if (results == null) {
+      return null;
+    }
+    if (results!.size > 1) {
+      return null;
+    }
+    try {
+      return results!.docs.first['name'];
+    } catch (e) {
+      print(e);
+    }
   }
 
   return null;

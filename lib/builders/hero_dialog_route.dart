@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class HeroDialogRoute<T> extends PageRoute<T> {
   HeroDialogRoute({
-    @required WidgetBuilder builder,
-    RouteSettings settings,
+    @required WidgetBuilder? builder,
+    RouteSettings? settings,
     bool fullscreenDialog = false,
   })  : _builder = builder,
         super(settings: settings, fullscreenDialog: fullscreenDialog);
 
-  final WidgetBuilder _builder;
+  final WidgetBuilder? _builder;
 
   @override
   bool get opaque => false;
@@ -34,7 +34,7 @@ class HeroDialogRoute<T> extends PageRoute<T> {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
-    return _builder(context);
+    return _builder!(context);
   }
 
   @override

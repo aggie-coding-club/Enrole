@@ -12,7 +12,7 @@ import 'package:enrole_app_dev/services/user_data.dart';
 
 class SearchOrgs extends StatefulWidget {
 
-  final Function callback;
+  final Function? callback;
 
   SearchOrgs({this.callback});
 
@@ -29,19 +29,20 @@ class _SearchOrgsState extends State<SearchOrgs> {
   ScrollController _scrollController = ScrollController();
 
 
-  Future<List<String>> schoolResults;
+  Future<List<String>?>? schoolResults;
 
   String orgSearch = '';
 
-  Future<List<Widget>> orgTiles;
+  Future<List<Widget>?>? orgTiles;
 
   String searchQuery = '';
 
   bool typing = false;
   
-  Future<List<Widget>> searchResults({String search, BuildContext context}) async {
+  Future<List<Widget>> searchResults({String? search, BuildContext? context}) async {
     List<Widget> tiles;
-    String school = context.read(userDataProvider).data.value.school;
+    String? school = context!.read(userDataProvider).data!.value.school;
+    if(search != null)
     try{
       AlgoliaQuerySnapshot querySnap = await _algolia.index('orgs').query(search).facetFilter('school:$school').getObjects();
       List<AlgoliaObjectSnapshot> results = querySnap.hits;
@@ -75,19 +76,24 @@ class _SearchOrgsState extends State<SearchOrgs> {
           switch(orgType){
             case 'public':{
               tileString = 'Public';
-              cardColor = Colors.lightGreen[200];
-              textColor = Colors.green[800];
+              cardColor = Colors.lightGreen[200]!;
+              textColor = Colors.green[800]!;
             }break;
             case 'private':{
               tileString = 'Private';
-              cardColor = Colors.lightBlue[200];
-              textColor = Colors.blue[800];
+              cardColor = Colors.lightBlue[200]!;
+              textColor = Colors.blue[800]!;
             } break;
             case 'application':{
               tileString = 'Application';
-              cardColor = Colors.yellow[100];
-              textColor = Colors.yellow[700];
+              cardColor = Colors.yellow[100]!;
+              textColor = Colors.yellow[700]!;
             } break;
+            default: {
+              tileString = 'Error';
+              cardColor = Colors.grey;
+              textColor = Colors.black;
+            }
           }
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -185,9 +191,9 @@ class _SearchOrgsState extends State<SearchOrgs> {
                 ? FutureBuilder(
                   future: searchResults(search: searchQuery, context: context),
                   builder: (context, snap){
-                    if(snap.connectionState == ConnectionState.done){
+                    if(snap.connectionState == ConnectionState.done && snap.data != null){
                       print('Algolia called');
-                      List<Widget> tiles = snap.data;
+                      List<Widget> tiles = snap.data as List<Widget>;
                       return NotificationListener(
                         onNotification: (t){
                           if(t is ScrollNotification){

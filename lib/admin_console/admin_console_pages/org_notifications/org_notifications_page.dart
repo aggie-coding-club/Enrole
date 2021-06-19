@@ -12,15 +12,15 @@ class OrgNotificationsPage extends StatefulWidget {
 class _OrgNotificationsPageState extends State<OrgNotificationsPage> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<QuerySnapshot> _orgNotificationSnapshots;
+  Future<QuerySnapshot?>? _orgNotificationSnapshots;
 
-  String _orgID;
+  String? _orgID;
 
-  Future<QuerySnapshot> getOrgNotifications(
-      BuildContext context, String orgID) async {
+  Future<QuerySnapshot?> getOrgNotifications(
+      BuildContext context, String? orgID) async {
     print('Getting notifications...');
 
-    QuerySnapshot query;
+    QuerySnapshot? query;
 
     try {
       query = await _firestore
@@ -43,10 +43,8 @@ class _OrgNotificationsPageState extends State<OrgNotificationsPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
       _orgID = context.read(currentOrgProvider).getOrgID();
       _orgNotificationSnapshots = getOrgNotifications(context, _orgID);
-    });
   }
 
   @override
@@ -55,8 +53,8 @@ class _OrgNotificationsPageState extends State<OrgNotificationsPage> {
       future: _orgNotificationSnapshots,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData) {
-            QuerySnapshot query = snapshot.data;
+          if (snapshot.hasData && snapshot.data != null) {
+            QuerySnapshot query = snapshot.data as QuerySnapshot;
             if (query.docs.length == 0) {
               return Text('No notifications');
             }
@@ -76,11 +74,11 @@ class _OrgNotificationsPageState extends State<OrgNotificationsPage> {
 
 List<Widget> notificationBuilder(QuerySnapshot querySnapshot) {
   List<Widget> _notificationTiles = [];
-
+  
   try {
     _notificationTiles = List.generate(querySnapshot.docs.length, (index) {
       return OrgNotificationBuilder(
-          notificationData: querySnapshot.docs[index].data());
+          notificationData: querySnapshot.docs[index].data() as Map<String, dynamic>);
     });
   } catch (error) {
     print(error);

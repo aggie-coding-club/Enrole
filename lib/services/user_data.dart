@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserDatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  JoinedOrg _currentOrg;
+  JoinedOrg? _currentOrg;
 
   Stream<UserData> streamUser(String userID) {
     return _firestore
@@ -36,8 +36,8 @@ class UserDatabaseService {
 
 class Organizations with ChangeNotifier {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<JoinedOrg> _orgs;
-  JoinedOrg _current;
+  List<JoinedOrg>? _orgs;
+  JoinedOrg? _current;
 
   Stream<List<JoinedOrg>> streamJoinedOrgs(String userID) {
     var ref =
@@ -54,15 +54,15 @@ class Organizations with ChangeNotifier {
 }
 
 class JoinedOrg {
-  final String orgName;
-  final String orgID;
-  final String userRole;
-  final String orgImageURL;
+  final String? orgName;
+  final String? orgID;
+  final String? userRole;
+  final String? orgImageURL;
 
   JoinedOrg({this.orgName, this.orgID, this.userRole, this.orgImageURL});
 
   factory JoinedOrg.fromFirestore(DocumentSnapshot document) {
-    Map data = document.data() ?? {};
+    Map data = document.data() as Map? ?? {};
 
     return JoinedOrg(
       orgName: data['orgName'] ?? 'Error',
@@ -74,15 +74,15 @@ class JoinedOrg {
 }
 
 class UserData {
-  final String username;
-  final String profileImageURL;
-  final String joinedDate;
-  final String school;
+  final String? username;
+  final String? profileImageURL;
+  final String? joinedDate;
+  final String? school;
 
   UserData({this.username, this.profileImageURL, this.joinedDate, this.school});
 
   factory UserData.fromFirestore(DocumentSnapshot document) {
-    Map data = document.data() ?? {};
+    Map data = document.data() as Map? ?? {};
     return UserData(
       school: data['school'] ?? 'Error loading school',
     );

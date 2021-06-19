@@ -6,15 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enrole_app_dev/services/user_data.dart';
 
 class GeneralInfoFormPage extends StatefulWidget {
-  final Function setName;
-  final Function setType;
+  final Function? setName;
+  final Function? setType;
 
-  final String orgName;
-  final String orgType;
-  final String school;
+  final String? orgName;
+  final String? orgType;
+  final String? school;
 
-  final Function hidePageControllers;
-  final Function showPageControllers;
+  final Function? hidePageControllers;
+  final Function? showPageControllers;
 
   GeneralInfoFormPage(
       {this.orgName,
@@ -32,11 +32,11 @@ class GeneralInfoFormPage extends StatefulWidget {
 class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  String orgType;
-  String school;
-  String schoolSearch;
+  String? orgType;
+  String? school;
+  String? schoolSearch;
 
-  TextEditingController categoryController;
+  TextEditingController? categoryController;
 
   TextEditingController nameController = TextEditingController();
 
@@ -44,7 +44,7 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
   void initState() {
     super.initState();
     if (this.widget.orgName != null) {
-      nameController.text = this.widget.orgName;
+      nameController.text = this.widget.orgName as String;
     }
   }
 
@@ -72,7 +72,7 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                         style: TextStyle(
                             fontSize: 18.0, fontWeight: FontWeight.bold),
                       ),
-                      Text(context.read(userDataProvider).when(data: (data)=>data.school, loading: ()=> 'loading...', error: (error, _)=> 'An error occurred retrieving your school')),
+                      Text(context.read(userDataProvider).when(data: (data)=>data.school!, loading: ()=> 'loading...', error: (error, _)=> 'An error occurred retrieving your school')),
                       SizedBox(height: 12.0),
                       TextField(
                         controller: nameController,
@@ -82,7 +82,7 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                           fontWeight: FontWeight.bold,
                         ),
                         onChanged: (value) {
-                          this.widget.setName(value);
+                          this.widget.setName!(value);
                         },
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -146,8 +146,8 @@ class _GeneralInfoFormPageState extends State<GeneralInfoFormPage> {
                           ],
                           onChanged: (value) {
                             setState(() {
-                              orgType = value;
-                              this.widget.setType(value);
+                              orgType = value as String;
+                              this.widget.setType!(value);
                             });
                           },
                         ),

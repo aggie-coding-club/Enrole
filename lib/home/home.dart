@@ -24,12 +24,13 @@ class _HomeState extends State<Home> {
 
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  String usersSchool;
+  String? usersSchool;
 
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   void reloadUser() async {
-    User initUser = _auth.currentUser;
+    User? initUser = _auth.currentUser;
+    if(initUser != null)
     await initUser.reload();
     print('Reloaded user');
   }
@@ -58,10 +59,14 @@ class _HomeState extends State<Home> {
               icon: Icon(Icons.menu,
                   size: 35.0, color: Theme.of(context).primaryColor),
               onPressed: () async {
-                if(_auth.currentUser.displayName == null){
-                  await _auth.currentUser.reload();
+                User? userReload = _auth.currentUser;
+                if(userReload != null){
+                  if(userReload.displayName == null){
+                  await userReload.reload();
                 }
-                _scaffoldKey.currentState.openDrawer();
+                if(_scaffoldKey.currentState != null)
+                _scaffoldKey.currentState!.openDrawer();}
+                
               }),
           title: FittedBox(
             fit: BoxFit.contain,
@@ -108,7 +113,7 @@ class _HomeState extends State<Home> {
               child: Center(
                 child: GestureDetector(
                   onTap: () {
-                    _scaffoldKey.currentState.openEndDrawer();
+                    _scaffoldKey.currentState!.openEndDrawer();
                   },
                   child: Consumer(builder: (context, watch, _) {
                     final _currentOrg = watch(currentOrgProvider);
@@ -137,7 +142,7 @@ class _HomeState extends State<Home> {
           elevation: 5.0,
           backgroundColor: Colors.white,
           iconTheme: IconThemeData(
-              color: Theme.of(context).appBarTheme.iconTheme.color),
+              color: Theme.of(context).appBarTheme.iconTheme!.color),
         ),
       ),
       drawer: Drawer(
@@ -215,7 +220,7 @@ class DrawerItems extends ConsumerWidget {
                     CircleAvatar(
                       radius: 40.0,
                       backgroundImage:
-                          NetworkImage(value.photoURL ?? "https://img.icons8.com/cotton/2x/gender-neutral-user--v2.png"),
+                          NetworkImage(value!.photoURL ?? "https://img.icons8.com/cotton/2x/gender-neutral-user--v2.png"),
                     ),
                     Expanded(
                       child: Container(),
@@ -246,7 +251,7 @@ class DrawerItems extends ConsumerWidget {
                 _userData.when(
                   loading: ()=>Text('Loading...'),
                   error: (error, _)=>Text('There was an error getting your school'),
-                  data: (value)=>Text(value.school),
+                  data: (value)=>Text(value.school!),
                 ),
                 
               ],

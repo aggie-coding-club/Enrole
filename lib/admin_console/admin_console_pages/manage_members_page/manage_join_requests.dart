@@ -10,7 +10,7 @@ class ManageJoinRequestsPage extends StatefulWidget {
 }
 
 class _ManageJoinRequestsPageState extends State<ManageJoinRequestsPage> {
-  Stream requestStream;
+  Stream? requestStream;
 
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -28,14 +28,7 @@ class _ManageJoinRequestsPageState extends State<ManageJoinRequestsPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      requestStream = joinRequestStream(context);
-    });
-  }
-
-  @override
-  void didInitState() {
-    // TODO: implement didInitState
+    requestStream = joinRequestStream(context);
   }
 
   @override
@@ -60,8 +53,10 @@ class _ManageJoinRequestsPageState extends State<ManageJoinRequestsPage> {
         body: StreamBuilder(
           stream: requestStream,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.active) {
-              QuerySnapshot querySnapshot = snapshot.data;
+            var snapData = snapshot.data;
+            if (snapshot.connectionState == ConnectionState.active &&
+                snapData != null) {
+              QuerySnapshot querySnapshot = snapshot.data as QuerySnapshot;
               if (querySnapshot.size != 0) {
                 return requestTiles(querySnapshot, context);
               } else {

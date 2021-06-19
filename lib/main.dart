@@ -1,3 +1,5 @@
+
+
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -95,7 +97,7 @@ class MyApp extends StatelessWidget {
 final firebaseAuthProvider =
     Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
 
-final userProvider = StreamProvider<User>((ref) {
+final userProvider = StreamProvider<User?>((ref) {
   // final stream = FirebaseAuth.instance.authStateChanges();
 
   // final streamController = StreamController<User>();
@@ -107,7 +109,7 @@ final userProvider = StreamProvider<User>((ref) {
   });
 
   // final watchAuth = ref.watch(firebaseAuthProvider);
-
+  
   return ref.watch(firebaseAuthProvider).userChanges();
 });
 
@@ -118,7 +120,7 @@ final joinedOrgsProvider = StreamProvider<List<JoinedOrg>>((ref) {
 
   currentUser.whenData((value) {
     final stream =
-        UserDatabaseService().streamJoinedOrgs(currentUser.data.value.uid);
+        UserDatabaseService().streamJoinedOrgs(currentUser.data!.value!.uid);
     streamController.addStream(stream);
   });
 
@@ -156,7 +158,12 @@ final userDataProvider = StreamProvider<UserData>((ref) {
   final streamController = StreamController<UserData>();
 
   currentUser.whenData((value) {
-    final stream = UserDatabaseService().streamUser(currentUser.data.value.uid);
+    String userID = '';
+    if(currentUser.data != null)
+    if(currentUser.data!.value != null)
+    userID = currentUser.data!.value!.uid;
+
+    final stream = UserDatabaseService().streamUser(userID);
 
     streamController.addStream(stream);
   });
@@ -169,11 +176,11 @@ final userDataProvider = StreamProvider<UserData>((ref) {
 });
 
 class CurrentOrg with ChangeNotifier {
-  JoinedOrg _org;
+  JoinedOrg? _org;
 
-  get org => _org;
+  JoinedOrg? get org => _org;
 
-  set org(JoinedOrg org) {
+  set org(JoinedOrg? org) {
     _org = org;
     notifyListeners();
   }
@@ -187,7 +194,7 @@ class CurrentOrg with ChangeNotifier {
 
   String getOrgURL() {
     if (_org != null) {
-      return _org.orgImageURL;
+      return _org!.orgImageURL!;
     } else {
       return "https://cdn4.iconfinder.com/data/icons/web-and-mobile-ui/24/UI-33-512.png";
     }
@@ -195,7 +202,7 @@ class CurrentOrg with ChangeNotifier {
 
   String getUserRole() {
     if (_org != null) {
-      return _org.userRole;
+      return _org!.userRole!;
     } else {
       return "member";
     }
@@ -203,7 +210,7 @@ class CurrentOrg with ChangeNotifier {
 
   String getOrgID() {
     if (_org != null) {
-      return _org.orgID;
+      return _org!.orgID!;
     } else {
       return "Error";
     }
@@ -211,7 +218,7 @@ class CurrentOrg with ChangeNotifier {
 
   String getOrgName() {
     if (_org != null) {
-      return _org.orgName;
+      return _org!.orgName!;
     } else {
       return "Error";
     }
@@ -223,11 +230,11 @@ class CurrentPage with ChangeNotifier {
   String _pageTitle = 'Join an Org';
   String _tag = 'overview';
 
-  get pageWidget => _pageWidget;
+  Widget get pageWidget => _pageWidget;
 
-  get pageTitle => _pageTitle;
+  String get pageTitle => _pageTitle;
 
-  get tag => _tag;
+  String get tag => _tag;
 
   set pageWidget(Widget widget) {
     _pageWidget = widget;
@@ -249,9 +256,9 @@ class CurrentAdminPage with ChangeNotifier {
   Widget _pageWidget = AnalyticsPage();
   String _pageTitle = 'Analytics';
 
-  get pageWidget => _pageWidget;
+  Widget get pageWidget => _pageWidget;
 
-  get pageTitle => _pageTitle;
+  String get pageTitle => _pageTitle;
 
   set pageWidget(Widget widget) {
     _pageWidget = widget;
@@ -267,16 +274,16 @@ class CurrentAdminPage with ChangeNotifier {
 class CurrentUser with ChangeNotifier {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  User _user;
+  User? _user;
 
-  get user => _user;
+  User? get user => _user;
 
-  set user(User user) {
+  set user(User? user) {
     _user = user;
     notifyListeners();
   }
 
-  Stream<User> userStream() {
+  Stream<User?> userStream() {
     return _auth.userChanges();
   }
 }
